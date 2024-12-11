@@ -1,0 +1,9 @@
+Hidden Markov Models for Stock Market Prediction
+Luigi Catello, Ludovica Ruggiero, Lucia Schiavone, and Mario Valentino
+https://arxiv.org/pdf/2310.03775
+
+Parallel MCMC sampling of AR-HMMs for prediction based option trading
+I. Róbert Sipos siposr@hit.bme.hu, Attila Ceffer, and János Levendovszky
+https://journals.sagepub.com/doi/full/10.3233/AF-190243
+
+
