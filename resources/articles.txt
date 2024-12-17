@@ -6,4 +6,8 @@ Parallel MCMC sampling of AR-HMMs for prediction based option trading
 I. Róbert Sipos siposr@hit.bme.hu, Attila Ceffer, and János Levendovszky
 https://journals.sagepub.com/doi/full/10.3233/AF-190243
 
+A combination of hidden Markov model and fuzzy model for stock market forecasting
+Md. Rafiul Hassan
+https://doi.org/10.1016/j.neucom.2008.09.029
+
 
