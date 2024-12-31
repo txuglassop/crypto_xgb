@@ -2,4 +2,5 @@ pandas
 numpy
 matplotlib
 tsfresh
-talib
+seaborn
+scikit-learn
