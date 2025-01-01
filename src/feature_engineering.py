@@ -74,3 +74,22 @@ def add_atr(df: pd.DataFrame, period = 14) -> pd.DataFrame:
 
     return df
 
+def add_dow(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Given a dataframe with a 'date' column in either '%d/%m/%y' or UNIX time (int), adds
+    a new column with the day of the week
+
+    params:
+        pd.DataFrame: df - dataframe as described above
+
+    returns:
+        pd.DataFrame - the same dataframe with a new column 'day_of_week' of type string
+    """
+    if df.dtypes['date'] == int or df.dtypes['date'] == float:
+        df['date'] = pd.to_datetime(df['date'], unit='ms').dt.strftime('%d/%m/%Y')
+    
+    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
+
+    df['day_of_week'] = df['date'].dt.day_name()
+
+    return df
