@@ -7,7 +7,7 @@ def add_headers_kline(path: str):
     original csv file. also converts open_time from unix time to d/m/y
 
     params:
-        str: filename - name of the csv file 
+        str: path - path to the csv
 
     returns:
         nothing 
@@ -18,7 +18,8 @@ def add_headers_kline(path: str):
     ]
 
     df = pd.read_csv(path, header=None, names=col_names, index_col=False)
-    df['date'] = pd.to_datetime(df['open_time'], unit='ms').dt.strftime('%d/%m/%Y')
+    #df['date'] = pd.to_datetime(df['open_time'], unit='ms').dt.strftime('%d/%m/%Y')
+    df['date'] = df['open_time']
     df = df.drop(columns=['ignore', 'open_time', 'close_time'])
 
     cols = ['date'] + [col for col in df.columns if col != 'date']

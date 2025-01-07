@@ -93,3 +93,84 @@ def add_dow(df: pd.DataFrame) -> pd.DataFrame:
     df['day_of_week'] = df['date'].dt.day_name()
 
     return df
+
+def add_return(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Given a dataframe with OHLC data, calculates percentage change in average price i.e. the return
+    
+    params:
+        pd.DataFrame: df - dataframe as described above
+
+    returns:
+        pd.DataFrame - the same dataframe with a col 'return' of type float
+    """
+    prices = np.divide(np.add(np.add(df['high'], df['low']), df['close']),3)
+    returns = np.zeros(len(prices))
+    returns[0] = np.nan
+
+    for idx in range(1, len(prices)):
+        returns[idx] = prices[idx] / prices[idx - 1] - 1
+    
+    df['return'] = returns
+    return df
+
+def add_jump_categories_3(df: pd.DataFrame, margin = 0.025):
+    """
+    Given a dataframe with a 'return' feature, adds a new feature which categorises the returns
+    into 3 categories according to the provided margin (around a return of 0, which is neutral)
+
+    params:
+        pd.DataFrame: df - dataframe with return col, ideally created by using add_return
+        float: margin - margin required when a return is considered significant enough to warrant
+            a category
+    
+    returns:
+        pd.DataFrame - the same DataFrame with a col 'jump' of type string
+    """
+    def jump_lookup(x):
+        if x < -margin:
+            return 'down'
+        elif x > margin:
+            return 'up'
+        else:
+            return 'neutral'
+        
+    jump = df['return']
+    jump = jump.apply(jump_lookup)
+
+    df['jump'] = jump
+    return df
+
+
+def add_jump_categories_5(df: pd.DataFrame, small_margin = 0.01, big_margin = 0.025):
+    """
+    Given a dataframe with a 'return' feature, adds a new feature which categorises the returns
+    into 5 categories according to the provided margins, with 'small' jumps being returns
+    are between the small and big margin, and big jumps are returns greater than the big_margin
+
+    params:
+        pd.DataFrame: df - dataframe with the return col
+        float: small_margin - the margin around 0 that is considered a neutral return
+        float: big_margin - differentiates the difference between a small and big jump
+
+    returns:
+        pd.DataFrame: the same DataFrame with a col 'jump' of type string
+    """
+
+    def jump_lookup(x):
+        if x > big_margin:
+            return 'big_up'
+        elif x < -big_margin:
+            return 'big_down'
+        elif x > small_margin:
+            return 'small_up'
+        elif x < -small_margin:
+            return 'small_down'
+        else:
+            return 'neutral'
+        
+    jump = df['return']
+    jump = jump.apply(jump_lookup)
+
+    df['jump'] = jump
+    return df

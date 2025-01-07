@@ -37,3 +37,4 @@ if [ -d "$STORE_DIRECTORY/data" ]; then
 fi
 
 find "$STORE_DIRECTORY" -maxdepth 1 -type f ! -name "*final*" -exec rm -f {} \;
+
