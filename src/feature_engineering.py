@@ -38,7 +38,7 @@ def add_ema(df: pd.DataFrame, period = 5, weighting_factor = 0.2) -> pd.DataFram
         ema[idx] = (prices[idx] * weighting_factor) + (ema[idx - 1] * (1 - weighting_factor))
 
     df['ema'] = ema
-    df['ema'] = df['ema'].replace(0, pd.NA)
+    df['ema'] = df['ema'].replace(0, np.nan)
 
     return df
 
@@ -70,7 +70,7 @@ def add_atr(df: pd.DataFrame, period = 14) -> pd.DataFrame:
         atr[idx] = (atr[idx-1] + tr[idx]) / period
 
     df['atr'] = atr
-    df['atr'] = df['atr'].replace(0, pd.NA)
+    df['atr'] = df['atr'].replace(0, np.nan)
 
     return df
 
