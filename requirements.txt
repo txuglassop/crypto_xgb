@@ -1,6 +1,7 @@
 pandas
 numpy
 matplotlib
-tsfresh
 seaborn
 scikit-learn
+xgboost
+optuna
