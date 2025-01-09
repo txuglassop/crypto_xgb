@@ -109,7 +109,7 @@ def add_return(df: pd.DataFrame) -> pd.DataFrame:
     returns[0] = np.nan
 
     for idx in range(1, len(prices)):
-        returns[idx] = prices[idx] / prices[idx - 1] - 1
+        returns[idx] = prices.iloc[idx] / prices.iloc[idx - 1] - 1
     
     df['return'] = returns
     return df
