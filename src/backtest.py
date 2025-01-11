@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import xgboost as xgb
 
 from typing import Callable, Any
 
@@ -67,27 +68,9 @@ class Backtest():
         a provided strategy. `strategies.py` has some default strategies, otherwise they can be
         declared and passed in.
 
-        The `strategy` method must take 4 parameters and return an integer:
-
         params:
-            int: `next_prediction` - an integer representing the prediction of the next price movement
-                as defined by the appropriate jump lookup from `get_jump_lookup`.
-            
-            float: `price` - a float with the current price, typically the last closing price
-            
-            int: `current_pos` - an integer representing the current position on the coin
-
-            float: `current_capital` - a float representing the current capital. It is up to the 
-                `strategy` method to decide whether purchasing a coin is appropriate/possible
-                given the current capital.
-        
-        return:
-            int: an integer representing the change in position. For example, `+1` would be to buy
-                1 coin, `-3` would be to sell 3 coins, and `0` is to do nothing.
+            strategy - as outlined in `strategies.py`
         """
-        # note that the last row of X_train contains information about the first entry in
-        # y_test
-        # we remedy this by removing this last row and making it the new first row of the test set
         X_train = self.X_train
         X_test = self.X_test
         y_train = self.y_train
@@ -95,22 +78,40 @@ class Backtest():
 
         # make sure the target is of the following form
         jump_lookup = get_jump_lookup(self.num_classes)
-        y_train = y_train.map(jump_lookup)
-        y_test = y_test.map(jump_lookup)
+        #y_train = y_train.map(jump_lookup)
+        #y_test = y_test.map(jump_lookup)
 
+        # note that the last row of X_train contains information about the first entry in
+        # y_test
+        # we remedy this by removing this last row and making it the new first row of the test set
         X_test = pd.concat([X_train.iloc[-1:], X_test], ignore_index=True)
         X_train = X_train.iloc[:-1]
+        y_test = pd.concat([y_train.iloc[-1:], y_test], ignore_index=True)
+        y_train = y_train.iloc[:-1]
 
         trades = np.zeros(X_test.shape[0])
+        current_capital = self.starting_capital
 
+        print('---------------- Starting backtest ----------------')
         for idx in range(len(trades)):
-            pass
+            try:
+                if idx == 0:
+                    temp_model = self.train(X_train, y_train)
+                else:
+                    temp_model = self.train(pd.concat([X_train, X_test.iloc[:idx]], ignore_index=True),
+                                            pd.concat([y_train, y_test.iloc[:idx]], ignore_index=True))
+                
+                ###### BELOW IS FOR XGBOOST ONLY!!!! WILL NEED TO FIX TO SUPPORT OTHER MODELS
+                next_prediction = temp_model.predict(xgb.DMatrix(X_test.iloc[[idx]], label=y_test.iloc[[idx]]))[0]
+            except:
+                print(f'Error in training/predicting at index {idx} of {len(trades)}')
+                raise ValueError
 
-    
-class Strategy():
-    def __init__(self, num_classes):
-        self.num_classes = num_classes
+            trades[idx] = strategy(next_prediction, X_test.iloc[[idx]]['close'].values[0], np.sum(trades), current_capital)
+            cost_of_trade = trades[idx] * X_test.iloc[[idx]]['close'].values[0]
+            current_capital -= cost_of_trade + self.commission * np.abs(cost_of_trade)
 
+        print('\n\n---------------- Backtest Complete! ----------------')
 
 
 if __name__ == '__main__':
