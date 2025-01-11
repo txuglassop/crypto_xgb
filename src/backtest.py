@@ -40,7 +40,7 @@ class Backtest():
         self.starting_capital = starting_capital
         self.commission = commission
 
-    def run_backtest(self, strategy: Callable[[int, float, int, float], int]):
+    def run_backtest(self, strategy: Callable[[int, float, int, float], int], train_frequency = 3):
         """
         Run a backtest using the provided variables when the class was declared and according to
         a provided strategy. `strategies.py` has some default strategies, otherwise they can be
@@ -48,6 +48,8 @@ class Backtest():
 
         params:
             strategy - as outlined in `strategies.py`
+
+            int: train_frequency - how often we retrain our model on incoming observations
         """
         X_train = self.X_train
         X_test = self.X_test
@@ -76,7 +78,7 @@ class Backtest():
             try:
                 if idx == 0:
                     temp_model = self.train(X_train, y_train)
-                else:
+                elif idx % train_frequency == 0:
                     temp_model = self.train(pd.concat([X_train, X_test.iloc[:idx]], ignore_index=True),
                                             pd.concat([y_train, y_test.iloc[:idx]], ignore_index=True))
                 
@@ -93,8 +95,13 @@ class Backtest():
 
         print('\n\n---------------- Backtest Complete! ----------------')
 
+        results = pd.DataFrame({
+            'open': X_test['open'],
+            'high': X_test['high'],
+            'low': X_test['low'],
+            'close': X_test['close'],
+            'position': trades,
+            'capital': capital
+        })
 
-
-
-if __name__ == '__main__':
-    test = Backtest()
+        return results
