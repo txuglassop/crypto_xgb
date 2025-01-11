@@ -3,29 +3,7 @@ import numpy as np
 import xgboost as xgb
 
 from typing import Callable, Any
-
-def get_jump_lookup(num_classes):
-    if num_classes == 3:
-        jump_lookup = {
-            'down':0,
-            'neutral':1,
-            'up':2
-        }
-        return jump_lookup
-    elif num_classes == 5:
-        jump_lookup = {
-            'big_down':0,
-            'small_down':1,
-            'neutral':2,
-            'small_up':3,
-            'big_up':4
-        }
-    try:
-        return jump_lookup
-    except:
-        print(f'Could not find a lookup for {num_classes} classes.')
-        raise SystemError
-    
+from utility_functions import get_jump_lookup 
 
 class Backtest():
     def __init__(
@@ -90,6 +68,7 @@ class Backtest():
         y_train = y_train.iloc[:-1]
 
         trades = np.zeros(X_test.shape[0])
+        capital = np.zeros(X_test.shape[0])
         current_capital = self.starting_capital
 
         print('---------------- Starting backtest ----------------')
@@ -110,8 +89,11 @@ class Backtest():
             trades[idx] = strategy(next_prediction, X_test.iloc[[idx]]['close'].values[0], np.sum(trades), current_capital)
             cost_of_trade = trades[idx] * X_test.iloc[[idx]]['close'].values[0]
             current_capital -= cost_of_trade + self.commission * np.abs(cost_of_trade)
+            capital[idx]= current_capital
 
         print('\n\n---------------- Backtest Complete! ----------------')
+
+
 
 
 if __name__ == '__main__':
