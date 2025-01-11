@@ -18,7 +18,12 @@ def classification_summary(y_pred: np.array, y_true: np.array):
     print('\n\n-------------- Confusion Matrix --------------')
     print(confusion_matrix(y_true, y_pred))
 
-def get_jump_lookup(num_classes):
+def get_jump_lookup(num_classes: int) -> dict:
+    """
+    Returns a lookup table that converts string categories for given
+    `num_classes` (from using the `add_jump_category` functions in 
+    `feature_engineering.py`) to integers.
+    """
     if num_classes == 3:
         jump_lookup = {
             'down':0,
