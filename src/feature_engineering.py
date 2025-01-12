@@ -114,7 +114,7 @@ def add_return(df: pd.DataFrame) -> pd.DataFrame:
     df['return'] = returns
     return df
 
-def add_jump_categories_3(df: pd.DataFrame, margin = 0.025):
+def add_jump_categories_3(df: pd.DataFrame, up_margin = 0.025, down_margin = 0.025):
     """
     Given a dataframe with a 'return' feature, adds a new feature which categorises the returns
     into 3 categories according to the provided margin (around a return of 0, which is neutral)
@@ -123,14 +123,18 @@ def add_jump_categories_3(df: pd.DataFrame, margin = 0.025):
         pd.DataFrame: df - dataframe with return col, ideally created by using add_return
         float: margin - margin required when a return is considered significant enough to warrant
             a category
+
+        float: up_margin - if a return is greater than this, classifed as 'up'
+
+        float: down_margin - if a return is less than this, classified as 'down'.
     
     returns:
         pd.DataFrame - the same DataFrame with a col 'jump' of type string
     """
     def jump_lookup(x):
-        if x < -margin:
+        if x < -np.abs(down_margin):
             return 'down'
-        elif x > margin:
+        elif x > up_margin:
             return 'up'
         else:
             return 'neutral'
@@ -142,7 +146,8 @@ def add_jump_categories_3(df: pd.DataFrame, margin = 0.025):
     return df
 
 
-def add_jump_categories_5(df: pd.DataFrame, small_margin = 0.01, big_margin = 0.025):
+def add_jump_categories_5(df: pd.DataFrame, big_down_margin = 0.025, small_down_margin = 0.01,
+                          small_up_margin = 0.01, big_up_margin = 0.025):
     """
     Given a dataframe with a 'return' feature, adds a new feature which categorises the returns
     into 5 categories according to the provided margins, with 'small' jumps being returns
@@ -150,21 +155,22 @@ def add_jump_categories_5(df: pd.DataFrame, small_margin = 0.01, big_margin = 0.
 
     params:
         pd.DataFrame: df - dataframe with the return col
-        float: small_margin - the margin around 0 that is considered a neutral return
-        float: big_margin - differentiates the difference between a small and big jump
+
+        all margins are floats, taken as absolute values, and interpreted the same as
+        `add_jump_categories_3`
 
     returns:
         pd.DataFrame: the same DataFrame with a col 'jump' of type string
     """
 
     def jump_lookup(x):
-        if x > big_margin:
+        if x > big_up_margin:
             return 'big_up'
-        elif x < -big_margin:
+        elif x < - np.abs(big_down_margin):
             return 'big_down'
-        elif x > small_margin:
+        elif x > small_up_margin:
             return 'small_up'
-        elif x < -small_margin:
+        elif x < -np.abs(small_down_margin):
             return 'small_down'
         else:
             return 'neutral'
