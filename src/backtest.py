@@ -40,7 +40,8 @@ class Backtest():
         self.starting_capital = starting_capital
         self.commission = commission
 
-    def run_backtest(self, strategy: Callable[[int, float, int, float], int], train_frequency = 3):
+    def run_backtest(self, strategy: Callable[[int, float, int, float], int],
+                     retrain = True, train_frequency = 7):
         """
         Run a backtest using the provided variables when the class was declared and according to
         a provided strategy. `strategies.py` has some default strategies, otherwise they can be
@@ -48,6 +49,9 @@ class Backtest():
 
         params:
             strategy - as outlined in `strategies.py`
+
+            boolean: retrain - set to `True` if the model is to be retrained on test data
+                throughout the backtest.
 
             int: train_frequency - how often we retrain our model on incoming observations
         """
@@ -78,7 +82,7 @@ class Backtest():
             try:
                 if idx == 0:
                     temp_model = self.train(X_train, y_train)
-                elif idx % train_frequency == 0:
+                elif idx % train_frequency == 0 and retrain:
                     temp_model = self.train(pd.concat([X_train, X_test.iloc[:idx]], ignore_index=True),
                                             pd.concat([y_train, y_test.iloc[:idx]], ignore_index=True))
                 
