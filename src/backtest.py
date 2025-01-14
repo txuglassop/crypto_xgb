@@ -3,7 +3,7 @@ import numpy as np
 import xgboost as xgb
 
 from typing import Callable, Any
-from utility_functions import get_jump_lookup 
+from utility_functions import get_jump_lookup, print_progress_bar 
 
 class Backtest():
     def __init__(
@@ -41,7 +41,7 @@ class Backtest():
         self.commission = commission
 
     def run_backtest(self, strategy: Callable[[int, float, int, float], int],
-                     retrain = True, train_frequency = 7):
+                     retrain = True, train_frequency = 7, progress_bar = True):
         """
         Run a backtest using the provided variables when the class was declared and according to
         a provided strategy. `strategies.py` has some default strategies, otherwise they can be
@@ -96,6 +96,8 @@ class Backtest():
             cost_of_trade = trades[idx] * X_test.iloc[[idx]]['close'].values[0]
             current_capital -= cost_of_trade + self.commission * np.abs(cost_of_trade)
             capital[idx]= current_capital
+
+            if progress_bar: print_progress_bar(idx+1, len(trades))
 
         print('\n\n---------------- Backtest Complete! ----------------')
 
