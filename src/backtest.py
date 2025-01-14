@@ -77,7 +77,7 @@ class Backtest():
         capital = np.zeros(X_test.shape[0])
         current_capital = self.starting_capital
 
-        print('---------------- Starting backtest ----------------')
+        print('---------------- Starting backtest ----------------\n')
         for idx in range(len(trades)):
             try:
                 if idx == 0:
