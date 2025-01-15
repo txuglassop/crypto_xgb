@@ -13,6 +13,8 @@ class Backtest():
         y_train: np.ndarray, 
         X_test: np.ndarray,
         y_test: np.ndarray,
+        train_timestamp: np.array,
+        test_timestamp: np.array,
         num_classes: int,
         starting_capital: float,
         commission: float
@@ -25,17 +27,25 @@ class Backtest():
             X_train, X_test, y_train, y_test are as usual, and must be of the form
                     that will work if passed into `model_trainer`
 
+            train_timestamp, test_timestamp - timestamps corresponding to train and
+                    test sets.
+
             int: num_classes - the number of classes in the target variable
 
             float: starting capital - your starting capital! used in backtests
 
             float: commission - the broker commission - used in backtests
         """
+        assert X_train.shape[0] == len(train_timestamp)
+        assert X_test.shape[0] == len(test_timestamp)
+
         self.train = model_trainer
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
         self.y_test = y_test
+        self.train_timestamp = train_timestamp
+        self.test_timestamp = test_timestamp
         self.num_classes = num_classes
         self.starting_capital = starting_capital
         self.commission = commission
@@ -50,7 +60,9 @@ class Backtest():
         params:
             strategy - as outlined in `strategies.py`
 
-            boolean: retrain - set to `True` if the model is to be retrained on test data
+            test_timestamp - an array of timestamps that correspond to the observation in y_test
+
+            bool: retrain - set to `True` if the model is to be retrained on test data
                 throughout the backtest.
 
             int: train_frequency - how often we retrain our model on incoming observations
@@ -73,11 +85,15 @@ class Backtest():
         y_test = pd.concat([y_train.iloc[-1:], y_test], ignore_index=True)
         y_train = y_train.iloc[:-1]
 
+        test_timestamp = pd.concat([self.train_timestamp[-1:], self.test_timestamp], ignore_index=True)
+        train_timestamp = self.train_timestamp[:-1]
+
         trades = np.zeros(X_test.shape[0])
         capital = np.zeros(X_test.shape[0])
         current_capital = self.starting_capital
 
-        print('---------------- Starting backtest ----------------\n')
+        print('-------------------- Starting backtest --------------------\n')
+
         for idx in range(len(trades)):
             try:
                 if idx == 0:
@@ -99,9 +115,13 @@ class Backtest():
 
             if progress_bar: print_progress_bar(idx+1, len(trades))
 
-        print('\n\n---------------- Backtest Complete! ----------------')
+        print('\n\n-------------------- Backtest Complete! --------------------')
+
+        print(X_test.shape)
+        print(len(self.test_timestamp))
 
         results = pd.DataFrame({
+            'timestamp': test_timestamp,
             'open': X_test['open'],
             'high': X_test['high'],
             'low': X_test['low'],

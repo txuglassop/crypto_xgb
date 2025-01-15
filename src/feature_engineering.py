@@ -85,12 +85,14 @@ def add_dow(df: pd.DataFrame) -> pd.DataFrame:
     returns:
         pd.DataFrame - the same dataframe with a new column 'day_of_week' of type string
     """
-    if df.dtypes['date'] == int or df.dtypes['date'] == float:
-        df['date'] = pd.to_datetime(df['date'], unit='ms').dt.strftime('%d/%m/%Y')
-    
-    df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y')
+    time = df['date']
 
-    df['day_of_week'] = df['date'].dt.day_name()
+    if df.dtypes['date'] == int or df.dtypes['date'] == float:
+        time = pd.to_datetime(df['date'], unit='ms').dt.strftime('%d/%m/%Y')
+    
+    time = pd.to_datetime(time, format='%d/%m/%Y')
+
+    df['day_of_week'] = time.dt.day_name()
 
     return df
 
