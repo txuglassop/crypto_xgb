@@ -85,8 +85,8 @@ class Backtest():
         y_test = pd.concat([y_train.iloc[-1:], y_test], ignore_index=True)
         y_train = y_train.iloc[:-1]
 
-        test_timestamp = pd.concat([self.train_timestamp[-1:], self.test_timestamp], ignore_index=True)
-        train_timestamp = self.train_timestamp[:-1]
+        test_timestamp = pd.concat([self.train_timestamp.iloc[-1:], self.test_timestamp], ignore_index=True)
+        train_timestamp = self.train_timestamp.iloc[:-1]
 
         trades = np.zeros(X_test.shape[0])
         capital = np.zeros(X_test.shape[0])
@@ -105,8 +105,7 @@ class Backtest():
                 ###### BELOW IS FOR XGBOOST ONLY!!!! WILL NEED TO FIX TO SUPPORT OTHER MODELS
                 next_prediction = temp_model.predict(xgb.DMatrix(X_test.iloc[[idx]], label=y_test.iloc[[idx]]))[0]
             except:
-                print(f'Error in training/predicting at index {idx} of {len(trades)}')
-                raise ValueError
+                raise ValueError(f'Error in training/predicting at index {idx} of {len(trades)}')
 
             trades[idx] = strategy(next_prediction, X_test.iloc[[idx]]['close'].values[0], np.sum(trades), current_capital)
             cost_of_trade = trades[idx] * X_test.iloc[[idx]]['close'].values[0]
@@ -116,9 +115,6 @@ class Backtest():
             if progress_bar: print_progress_bar(idx+1, len(trades))
 
         print('\n\n-------------------- Backtest Complete! --------------------')
-
-        print(X_test.shape)
-        print(len(self.test_timestamp))
 
         results = pd.DataFrame({
             'timestamp': test_timestamp,
