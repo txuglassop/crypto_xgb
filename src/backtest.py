@@ -90,6 +90,7 @@ class Backtest():
 
         trades = np.zeros(X_test.shape[0])
         capital = np.zeros(X_test.shape[0])
+        predictions = np.zeros(X_test.shape[0])
         current_capital = self.starting_capital
 
         print('-------------------- Starting backtest --------------------\n')
@@ -104,9 +105,11 @@ class Backtest():
                 
                 ###### BELOW IS FOR XGBOOST ONLY!!!! WILL NEED TO FIX TO SUPPORT OTHER MODELS
                 next_prediction = temp_model.predict(xgb.DMatrix(X_test.iloc[[idx]], label=y_test.iloc[[idx]]))[0]
+                next_prediction = np.argmax(next_prediction)
             except:
                 raise ValueError(f'Error in training/predicting at index {idx} of {len(trades)}')
 
+            predictions[idx] = next_prediction
             trades[idx] = strategy(next_prediction, X_test.iloc[[idx]]['close'].values[0], np.sum(trades), current_capital)
             cost_of_trade = trades[idx] * X_test.iloc[[idx]]['close'].values[0]
             current_capital -= cost_of_trade + self.commission * np.abs(cost_of_trade)
@@ -122,6 +125,8 @@ class Backtest():
             'high': X_test['high'],
             'low': X_test['low'],
             'close': X_test['close'],
+            'predictions': predictions,
+            'actual': y_test,
             'position': trades,
             'capital': capital
         })
