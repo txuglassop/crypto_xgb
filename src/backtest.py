@@ -23,7 +23,7 @@ class Backtest():
         params:
             model_trainer - a Callable that takes `X_train`, `y_train`, and returns
                     a model that has the `.predict` method
-            
+
             X_train, X_test, y_train, y_test are as usual, and must be of the form
                     that will work if passed into `model_trainer`
 
@@ -127,7 +127,7 @@ class Backtest():
             'close': X_test['close'],
             'predictions': predictions,
             'actual': y_test,
-            'position': trades,
+            'trades': trades,
             'capital': capital
         })
 
