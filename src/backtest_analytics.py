@@ -36,7 +36,7 @@ def plot_backtest(backtest_results: pd.DataFrame, portion = [0, 100]):
         close=df['close']
     ), row=1, col=1)
 
-    portfolio_value = df['capital'] + df['position'].cumsum() * df['close']    
+    portfolio_value = df['capital'] + df['trades'].cumsum() * df['close']    
 
     # portfolio value plot
     fig.add_trace(go.Scatter(
