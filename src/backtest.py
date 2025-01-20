@@ -102,7 +102,7 @@ class Backtest():
                 elif idx % train_frequency == 0 and retrain:
                     temp_model = self.train(pd.concat([X_train, X_test.iloc[:idx]], ignore_index=True),
                                             pd.concat([y_train, y_test.iloc[:idx]], ignore_index=True))
-                
+
                 ###### BELOW IS FOR XGBOOST ONLY!!!! WILL NEED TO FIX TO SUPPORT OTHER MODELS
                 next_prediction = temp_model.predict(xgb.DMatrix(X_test.iloc[[idx]], label=y_test.iloc[[idx]]))[0]
                 next_prediction = np.argmax(next_prediction)
@@ -130,5 +130,7 @@ class Backtest():
             'trades': trades,
             'capital': capital
         })
+
+        results['equity'] = results['capital'] + results['trades'].cumsum() * results['close']
 
         return results
