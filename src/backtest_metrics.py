@@ -122,10 +122,10 @@ def get_trades(backtest_results: pd.DataFrame) -> pd.DataFrame:
 
     return trades_df
 
-def get_backtest_analytics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict:
+def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict:
     """
-    Get analytics relevant to performance of strategy in backtest.
-    Inspired by `backtesting_py` backtest output 
+    Get metrics relevant to performance of strategy in backtest.
+    Inspired by `backtesting.py` backtest output 
     """
     trades_df = get_trades(backtest_results)
     winning_trades = trades_df[trades_df['exit_price'] > trades_df['entry_price']]
@@ -172,7 +172,7 @@ def get_backtest_analytics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> di
     avg_time_between_trades = avg_time_between_trades / 1000 / 60 / 60
     avg_time_between_trades = str(avg_time_between_trades) + ' hours'
 
-    backtest_analytics = {
+    backtest_metrics = {
         'start': start,
         'end': end,
         'duration': duration,
@@ -193,7 +193,9 @@ def get_backtest_analytics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> di
         'avg_time_between_trades': avg_time_between_trades
     }
 
-    return backtest_analytics
+    return backtest_metrics
 
+def print_backtest_metrics():
+    pass
     
 
