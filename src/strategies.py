@@ -34,3 +34,14 @@ def basic_3_class_strategy(next_prediction: int, price: float, current_pos: int,
         return +1
     else:
         return 0
+    
+def all_in_3_class(next_prediction: int, price: float, current_pos: int, current_capital: float) -> int:
+    """
+    If predicted up, then buy all possible, if predicted down, sell everything
+    """
+    if next_prediction == 0:
+        return -current_pos
+    elif next_prediction == 2:
+        return current_capital // price
+    else:
+        return 0

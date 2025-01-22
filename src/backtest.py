@@ -133,4 +133,6 @@ class Backtest():
 
         results['equity'] = results['capital'] + results['trades'].cumsum() * results['close']
 
+        results.__name__ = strategy.__name__
+
         return results

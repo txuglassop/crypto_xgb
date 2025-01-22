@@ -6,6 +6,7 @@ from plotly.subplots import make_subplots
 
 from datetime import datetime
 from statistics import variance
+from textwrap import dedent
 
 from utility_functions import get_monthly_returns, classification_summary
 
@@ -160,6 +161,7 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
     # trades information
     num_trades = trades_df.shape[0]
     win_rate = winning_trades.shape[0] / num_trades
+    avg_trade = np.average(trades_df['exit_price'] / trades_df['entry_price'] - 1)
 
     winning_trade_returns = winning_trades['exit_price'] / winning_trades['entry_price'] - 1
     losing_trade_returns = losing_trades['exit_price'] / losing_trades['entry_price'] - 1
@@ -188,17 +190,19 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
         'sharpe_ratio': sharpe_ratio,
         'num_trades': num_trades,
         'win_rate': win_rate,
+        'avg_trade': avg_trade,
+        'avg_trade_duration': avg_trade_duration,
         'best_trade': best_trade,
         'avg_winning_trade': avg_winning_trade,
         'worst_trade': worst_trade,
-        'avg_losing_trade': avg_losing_trade,
-        'avg_trade_duration': avg_trade_duration
+        'avg_losing_trade': avg_losing_trade
     }
 
     return backtest_metrics
 
 def print_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> None:
     metrics = get_backtest_metrics(backtest_results, rf_rate)
+
     print(f'''
 ================ Backtest  Metrics ================
 
@@ -210,29 +214,33 @@ Duration:                       {metrics['duration']}
 
 ---------------- Strategy Metrics -----------------
 
-Exposure:                       {metrics['exposure']}
-Initial Equity:                 {metrics['equity_start']}
-Equity High:                    {metrics['equity_high']}
-Equity Low:                     {metrics['equity_low']}
-Final Equity:                   {metrics['equity_final']}
+Strategy:                       {backtest_results.__name__}
 
-Return (ann.) [%]:              {metrics['ann_return'] * 100}
-Buy & Hold Return (ann.) [%]:   {metrics['buy_hold_ann_return'] * 100}
-Volatility (ann.) [%]           {metrics['ann_volatility'] * 100}
-Sharpe Ratio                    {metrics['sharpe_ratio']}
+Exposure:                       {metrics['exposure']:<10}
+Initial Equity:                 {metrics['equity_start']:<10.2f}
+Equity High:                    {metrics['equity_high']:<10.2f}
+Equity Low:                     {metrics['equity_low']:<10.2f}
+Final Equity:                   {metrics['equity_final']:<10.2f}
+
+Return (ann.) [%]:              {metrics['ann_return'] * 100:<10.2f}
+Buy & Hold Return (ann.) [%]:   {metrics['buy_hold_ann_return'] * 100:<10.2f}
+Volatility (ann.) [%]:          {metrics['ann_volatility'] * 100:<10.2f}
+Sharpe Ratio (R={rf_rate*100:.2f}%): {metrics['sharpe_ratio']:<10.2f}
 
 ----------------- Trade  Metrics ------------------
 
-Num. Trades                     {metrics['num_trades']}
-Win Rate [%]                    {metrics['win_rate']}
-Avg. Trade Duration             {metrics['avg_trade_duration']}
+Num. Trades:                    {metrics['num_trades']:<10}
+Win Rate [%]:                   {metrics['win_rate'] * 100:<10.2f}
+Avg. Trade [%]:                 {metrics['avg_trade'] * 100:<10.2f}
+Avg. Trade Duration:            {metrics['avg_trade_duration']:<10}
 
-Best Trade [%]                  {metrics['best_trade'] * 100}
-Avg. Winning Trade [%]          {metrics['avg_winning_trade'] * 100}
+Best Trade [%]:                 {metrics['best_trade'] * 100:<10.2f}
+Avg. Winning Trade [%]:         {metrics['avg_winning_trade'] * 100:<10.2f}
 
-Worst Trade [%]                 {metrics['worst_trade'] * 100}
-Avg. Losing Trade [%]           {metrics['avg_losing_trade'] * 100}          
+Worst Trade [%]:                {metrics['worst_trade'] * 100:<10.2f}
+Avg. Losing Trade [%]:          {metrics['avg_losing_trade'] * 100:<10.2f}
 ''')
+
     classification_summary(backtest_results['actual'], backtest_results['predictions'])
     
 
