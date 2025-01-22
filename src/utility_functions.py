@@ -1,5 +1,8 @@
-from sklearn.metrics import confusion_matrix, classification_report
 import numpy as np
+import pandas as pd
+
+from datetime import datetime
+from sklearn.metrics import confusion_matrix, classification_report
 
 def classification_summary(y_pred: np.array, y_true: np.array):
     """
@@ -66,3 +69,35 @@ def print_progress_bar (iteration, total, prefix = 'Progress:', suffix = 'Comple
     # Print New Line on Complete
     if iteration == total: 
         print()
+
+def get_monthly_returns(timestamp: pd.Series, equity: pd.Series) -> list:
+    """
+    Returns an array of monthly returns for historical equity. Note the
+    value of `timestamp` and `equity` at a given index refer to the same point
+    in time
+
+    params:
+        timestamp (np.array) - UNIX timestamps in ms
+
+        equity (np.array) - equity positions that correspond to `timestamp`
+
+    returns:
+        an array containing the monthly returns
+    """
+    assert len(timestamp) == len(equity)
+    returns = list()
+
+    months = pd.to_datetime(timestamp, unit='ms').dt.month
+    cur_month = months[0]
+    start = equity[0]
+
+    for idx in range(len(months) - 1):
+        if months[idx+1] == cur_month:
+            continue # still in the same month
+        end = equity[idx]
+        returns.append(end / start - 1)
+        start = equity[idx+1]
+        cur_month = months[idx+1]
+    returns.append(equity[len(equity)-1] / start - 1)
+
+    return returns

@@ -4,7 +4,12 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-def plot_backtest(backtest_results: pd.DataFrame, portion = [0, 100]):
+from datetime import datetime
+from statistics import variance
+
+from utility_functions import get_monthly_returns
+
+def plot_backtest(backtest_results: pd.DataFrame, portion = [0, 100]) -> None:
     """
     Visualises backtest results, plotting a certain portion of the test
 
@@ -25,7 +30,7 @@ def plot_backtest(backtest_results: pd.DataFrame, portion = [0, 100]):
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
                         vertical_spacing=0.1, 
                         row_heights=[0.4, 0.3, 0.3], 
-                        subplot_titles=("OHLC Chart of Test Data", "Portfolio Value", "Position"))
+                        subplot_titles=("OHLC Chart of Test Data", "Equity", "Position"))
 
     # OHLC plot
     fig.add_trace(go.Ohlc(
@@ -36,15 +41,15 @@ def plot_backtest(backtest_results: pd.DataFrame, portion = [0, 100]):
         close=df['close']
     ), row=1, col=1)
 
-    portfolio_value = df['capital'] + df['trades'].cumsum() * df['close']    
+    equity = df['capital'] + df['trades'].cumsum() * df['close']    
 
     # portfolio value plot
     fig.add_trace(go.Scatter(
         x=df['timestamp'],
-        y=portfolio_value,
+        y=equity,
         mode='lines',
         line=dict(color='blue'),
-        name='Current Portfolio Value'
+        name='Equity'
     ), row=2, col=1)
 
     # trades plot
@@ -69,11 +74,18 @@ def plot_backtest(backtest_results: pd.DataFrame, portion = [0, 100]):
     
     fig.show()
 
-def trade_analyser(backtest_results: pd.DataFrame):
+def get_trades(backtest_results: pd.DataFrame) -> pd.DataFrame:
     """
     Given the backtest results (as returned from `run_backtest`), will
     analyse all trades made throughout the test and return analytics
     about them
+
+    params:
+        backtest_results (pd.DataFrame) - the results returned from the 
+                `run_backtest` module from `backtest`
+
+    returns:
+        pd.DataFrame - a dataframe with entry/exit time+price for all trades
     """
     col_names = ['trade_entry', 'trade_exit', 'entry_price', 'exit_price']
     trades_df = pd.DataFrame(columns=col_names)
@@ -109,3 +121,79 @@ def trade_analyser(backtest_results: pd.DataFrame):
                     ongoing_trades = True
 
     return trades_df
+
+def get_backtest_analytics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict:
+    """
+    Get analytics relevant to performance of strategy in backtest.
+    Inspired by `backtesting_py` backtest output 
+    """
+    trades_df = get_trades(backtest_results)
+    winning_trades = trades_df[trades_df['exit_price'] > trades_df['entry_price']]
+    losing_trades = trades_df[trades_df['exit_price'] <= trades_df['entry_price']]
+    equity = backtest_results['equity'].values
+
+    # deterministic information
+    start = datetime.fromtimestamp(backtest_results['timestamp'][0] / 1000)
+    end = datetime.fromtimestamp(backtest_results.iloc[-1]['timestamp'] / 1000)
+
+    time_diff = end - start
+    days = time_diff.days
+    seconds = time_diff.seconds
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    duration = f'{days} days, {hours} hours, {minutes} mins, {seconds} seconds'
+
+    # equity information
+    equity_start = equity[0]
+    equity_final = equity[len(equity) - 1]
+    equity_high = max(equity)
+    equity_low = min(equity)
+
+    buy_hold_ann_return = ((backtest_results.iloc[-1]['close'] /  backtest_results['open'][0]) - 1) / time_diff.days * 365
+
+    monthly_returns = get_monthly_returns(backtest_results['timestamp'], equity)
+    avg_ann_return = np.mean(monthly_returns) * 12
+    avg_ann_volatility = np.sqrt(variance(monthly_returns)) * 12
+    sharpe_ratio = avg_ann_return / avg_ann_volatility
+
+    # trades information
+    num_trades = trades_df.shape[0]
+    win_rate = winning_trades.shape[0] / num_trades
+
+    winning_trade_returns = winning_trades['exit_price'] / winning_trades['entry_price'] - 1
+    losing_trade_returns = losing_trades['exit_price'] / losing_trades['entry_price'] - 1
+    best_trade = max(winning_trade_returns)
+    avg_winning_trade = np.mean(winning_trade_returns)
+    worst_trade = min(losing_trade_returns)
+    avg_losing_trade = np.mean(losing_trade_returns)
+
+    time_between_trades = trades_df['trade_exit'] - trades_df['trade_entry']
+    avg_time_between_trades = np.mean(time_between_trades)
+    avg_time_between_trades = avg_time_between_trades / 1000 / 60 / 60
+    avg_time_between_trades = str(avg_time_between_trades) + ' hours'
+
+    backtest_analytics = {
+        'start': start,
+        'end': end,
+        'duration': duration,
+        'equity_start': equity_start,
+        'equity_high': equity_high,
+        'equity_low': equity_low,
+        'equity_final': equity_final,
+        'buy_hold_ann_return': buy_hold_ann_return,
+        'ann_return': avg_ann_return,
+        'ann_volatility': avg_ann_volatility,
+        'sharpe_ratio': sharpe_ratio,
+        'num_trades': num_trades,
+        'win_rate': win_rate,
+        'best_trade': best_trade,
+        'avg_winning_trade': avg_winning_trade,
+        'worst_trade': worst_trade,
+        'avg_losing_trade': avg_losing_trade,
+        'avg_time_between_trades': avg_time_between_trades
+    }
+
+    return backtest_analytics
+
+    
+

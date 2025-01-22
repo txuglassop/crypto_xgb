@@ -7,3 +7,5 @@ notebooks/test.ipynb
 notebooks/optuna.db
 
 backtests/
+
+.vscode/
