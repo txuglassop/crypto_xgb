@@ -7,7 +7,7 @@ from plotly.subplots import make_subplots
 from datetime import datetime
 from statistics import variance
 
-from utility_functions import get_monthly_returns
+from utility_functions import get_monthly_returns, classification_summary
 
 def plot_backtest(backtest_results: pd.DataFrame, portion = [0, 100]) -> None:
     """
@@ -144,6 +144,7 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
     duration = f'{days} days, {hours} hours, {minutes} mins, {seconds} seconds'
 
     # equity information
+    exposure = np.sum(backtest_results['trades'].cumsum() != 0) / backtest_results.shape[0]
     equity_start = equity[0]
     equity_final = equity[len(equity) - 1]
     equity_high = max(equity)
@@ -153,7 +154,7 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
 
     monthly_returns = get_monthly_returns(backtest_results['timestamp'], equity)
     avg_ann_return = np.mean(monthly_returns) * 12
-    avg_ann_volatility = np.sqrt(variance(monthly_returns)) * 12
+    avg_ann_volatility = np.sqrt(variance(monthly_returns) * 12)
     sharpe_ratio = avg_ann_return / avg_ann_volatility
 
     # trades information
@@ -168,14 +169,15 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
     avg_losing_trade = np.mean(losing_trade_returns)
 
     time_between_trades = trades_df['trade_exit'] - trades_df['trade_entry']
-    avg_time_between_trades = np.mean(time_between_trades)
-    avg_time_between_trades = avg_time_between_trades / 1000 / 60 / 60
-    avg_time_between_trades = str(avg_time_between_trades) + ' hours'
+    avg_trade_duration = np.mean(time_between_trades)
+    avg_trade_duration = avg_trade_duration / 1000 / 60 / 60
+    avg_trade_duration = str(avg_trade_duration) + ' hours'
 
     backtest_metrics = {
         'start': start,
         'end': end,
         'duration': duration,
+        'exposure': exposure,
         'equity_start': equity_start,
         'equity_high': equity_high,
         'equity_low': equity_low,
@@ -190,12 +192,47 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
         'avg_winning_trade': avg_winning_trade,
         'worst_trade': worst_trade,
         'avg_losing_trade': avg_losing_trade,
-        'avg_time_between_trades': avg_time_between_trades
+        'avg_trade_duration': avg_trade_duration
     }
 
     return backtest_metrics
 
-def print_backtest_metrics():
-    pass
+def print_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> None:
+    metrics = get_backtest_metrics(backtest_results, rf_rate)
+    print(f'''
+================ Backtest  Metrics ================
+
+---------------- Test  Information ----------------
+
+Start:                          {metrics['start']}
+End:                            {metrics['end']}
+Duration:                       {metrics['duration']}
+
+---------------- Strategy Metrics -----------------
+
+Exposure:                       {metrics['exposure']}
+Initial Equity:                 {metrics['equity_start']}
+Equity High:                    {metrics['equity_high']}
+Equity Low:                     {metrics['equity_low']}
+Final Equity:                   {metrics['equity_final']}
+
+Return (ann.) [%]:              {metrics['ann_return'] * 100}
+Buy & Hold Return (ann.) [%]:   {metrics['buy_hold_ann_return'] * 100}
+Volatility (ann.) [%]           {metrics['ann_volatility'] * 100}
+Sharpe Ratio                    {metrics['sharpe_ratio']}
+
+----------------- Trade  Metrics ------------------
+
+Num. Trades                     {metrics['num_trades']}
+Win Rate [%]                    {metrics['win_rate']}
+Avg. Trade Duration             {metrics['avg_trade_duration']}
+
+Best Trade [%]                  {metrics['best_trade'] * 100}
+Avg. Winning Trade [%]          {metrics['avg_winning_trade'] * 100}
+
+Worst Trade [%]                 {metrics['worst_trade'] * 100}
+Avg. Losing Trade [%]           {metrics['avg_losing_trade'] * 100}          
+''')
+    classification_summary(backtest_results['actual'], backtest_results['predictions'])
     
 

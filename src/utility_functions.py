@@ -15,10 +15,10 @@ def classification_summary(y_pred: np.array, y_true: np.array):
     returns:
         nothing 
     """
-    print('\n------------ Classification Report ------------')
+    print('\n-------------- Classification Report --------------')
     print(classification_report(y_true, y_pred))
 
-    print('\n\n-------------- Confusion Matrix --------------')
+    print('\n\n---------------- Confusion Matrix ----------------')
     print(confusion_matrix(y_true, y_pred))
 
 def get_jump_lookup(num_classes: int) -> dict:
