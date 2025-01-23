@@ -2,9 +2,9 @@
 
 input/
 
-notebooks/test.ipynb
+notebooks/
+!notebooks/xgboost.ipynb
 
-notebooks/optuna.db
 
 backtests/
 

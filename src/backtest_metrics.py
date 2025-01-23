@@ -159,7 +159,7 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
     sharpe_ratio = avg_ann_return / avg_ann_volatility
 
     # trades information
-    num_trades = trades_df.shape[0]
+    num_trades = np.sum(backtest_results['trades'] > 0)
     win_rate = winning_trades.shape[0] / num_trades
     avg_trade = np.average(trades_df['exit_price'] / trades_df['entry_price'] - 1)
 
