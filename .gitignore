@@ -1,10 +1,12 @@
 **/__pycache__/
 
-input/
+input/*
 
-notebooks/
+notebooks/*
+!notebooks/wf.ipynb
 
+backtests/*
 
-backtests/
+!backtests/
 
 .vscode/
