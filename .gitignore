@@ -3,7 +3,6 @@
 input/
 
 notebooks/
-!notebooks/xgboost.ipynb
 
 
 backtests/
