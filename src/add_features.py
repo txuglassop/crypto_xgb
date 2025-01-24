@@ -1,7 +1,7 @@
 """
 Use this module to add features from `feature_engineering.py`
 
-All features from above module are imported, and more can be added
+All features from this module are imported, and more can be added
 (such as taking the difference between two)
 """
 
@@ -26,6 +26,7 @@ def add_features(df: pd.DataFrame, session) -> list:
     """
     # first, add the target variable according to num_classes
     add_return(df)
+    add_log_return(df)
 
     if session.num_classes == 3:
         add_jump_categories_3(df, session.up_margin, session.down_margin)
@@ -35,15 +36,31 @@ def add_features(df: pd.DataFrame, session) -> list:
             session.small_up_margin, session.big_up_margin
         )
     else:
-        raise(f'Could not add target variable, received num_classes {session.num_classes}')
+        raise ValueError(f'Could not add target variable, received num_classes {session.num_classes}')
     
     df['next_jump'] = df['jump'].shift(-1)
 
-    add_atr(df)
-    add_ema(df)
+    add_atr(df, period=12)
+    add_atr(df, period=24)
+    add_atr(df, period=24*5) # 120
+    add_ema(df, period=5)
+    add_ema(df, period=24)
+    add_ema(df, period=24*5)
+    add_sma(df, window=5)
+    add_sma(df, window=24)
+    add_sma(df, window=24*5)
+    df['atr_24_atr_12'] = df['atr_24'] - df['atr_12']
+    df['ema_sma_5'] = df['ema_5'] - df['sma_5']
+    df['ema_sma_24'] = df['ema_24'] - df['sma_24']
+    df['ema_sma_120'] = df['ema_120'] - df['sma_120']
     add_vwap(df)
     add_dow(df) # one-hot encoding will be done elsewhere
 
-    cols = ['open', 'high', 'low', 'close', 'volume', 'atr', 'ema', 'vwap']
+    cols = [
+        'open', 'high', 'low', 'close', 'volume', 'return', 'log_return',
+        'atr_12', 'atr_24', 'atr_120', 'ema_5', 'ema_24', 'ema_120',
+        'sma_5', 'sma_24', 'sma_120', 'atr_24_atr_12', 'ema_sma_5',
+        'ema_sma_24', 'ema_sma_120'
+    ]
 
     return cols

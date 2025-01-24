@@ -20,9 +20,6 @@ def add_vwap(df: pd.DataFrame):
 
     params:
         pd DataFrame: df - a dataframe containing features as described above
-
-    returns:
-        pd DataFrame - a new df containing this new feature 
     """
     df['vwap'] = (((df['high'] + df['low'] + df['close']) / 3) * df['volume']).cumsum() / df['volume'].cumsum()
 
@@ -35,9 +32,6 @@ def add_ema(df: pd.DataFrame, period = 5, weighting_factor = 0.2):
         pd DataFrame: df - a dataframe containing 'high', 'low', 'close'
         int: period - specifying the period the EMA is taken over
         float: weighting_factor - a number in (0,1) that specfies the weight placed on recent obs
-
-    returns:
-        pd DataFrame - a new df containing this new feature. Note NA's will be introduced
     """
     prices = np.divide(np.add(np.add(df['high'], df['low']), df['close']),3)
     ema = np.zeros(len(prices))
@@ -51,6 +45,26 @@ def add_ema(df: pd.DataFrame, period = 5, weighting_factor = 0.2):
     df[name] = ema
     df[name] = df[name].replace(0, np.nan)
 
+def add_sma(df: pd.DataFrame, window = 7):
+    """
+    Adds a simple moving average feature, taking `window` entries into account
+
+    params:
+        df (pd.DataFrame)
+        window (int) - the number of entries to take the average of. includes the
+            current row and the past `window-1` entries.
+    """
+    prices = np.divide(np.add(np.add(df['high'], df['low']), df['close']),3)
+    sma = np.zeros(len(prices))
+    for idx in range(window - 1, len(prices)):
+        sma[idx] = np.mean(prices[idx-window+1:idx+1])
+
+    name = 'sma_' + str(window)
+
+    df[name] = sma
+    df[name] = df[name].replace(0, np.nan)
+        
+
 def add_atr(df: pd.DataFrame, period = 14):
     """
     Given a dataframe, adds Average True Range (ATR) according to a specified period.
@@ -58,9 +72,6 @@ def add_atr(df: pd.DataFrame, period = 14):
     params:
         pd DataFrame: df - a dataframe containing 'high', 'low', 'close'
         int: period - specifies the period the ATR is taken over
-
-    returns:
-        pd DataFrame - a new df containing this feature. Note NA's will be introduced
     """
     high = df['high']
     low = df['low']
@@ -78,8 +89,9 @@ def add_atr(df: pd.DataFrame, period = 14):
     for idx in range(period+1, len(tr)):
         atr[idx] = (atr[idx-1] + tr[idx]) / period
 
-    df['atr'] = atr
-    df['atr'] = df['atr'].replace(0, np.nan)
+    name = 'atr_' + str(period)
+    df[name] = atr
+    df[name] = df[name].replace(0, np.nan)
 
 def add_dow(df: pd.DataFrame):
     """
@@ -88,9 +100,6 @@ def add_dow(df: pd.DataFrame):
 
     params:
         pd.DataFrame: df - dataframe as described above
-
-    returns:
-        pd.DataFrame - the same dataframe with a new column 'day_of_week' of type string
     """
     time = df['date']
 
@@ -107,9 +116,6 @@ def add_return(df: pd.DataFrame):
     
     params:
         pd.DataFrame: df - dataframe as described above
-
-    returns:
-        pd.DataFrame - the same dataframe with a col 'return' of type float
     """
     prices = np.divide(np.add(np.add(df['high'], df['low']), df['close']),3)
     returns = np.zeros(len(prices))
@@ -119,6 +125,15 @@ def add_return(df: pd.DataFrame):
         returns[idx] = prices.iloc[idx] / prices.iloc[idx - 1] - 1
     
     df['return'] = returns
+
+def add_log_return(df: pd.DataFrame):
+    prices = np.divide(np.add(np.add(df['high'], df['low']), df['close']),3)
+    prices = prices.to_numpy()
+    log_returns = np.empty_like(prices, dtype=float)
+    log_returns[0] = np.nan
+    log_returns[1:] = np.log(prices[1:] / prices[:-1])
+
+    df['log_return'] = log_returns
 
 def add_jump_categories_3(df: pd.DataFrame, up_margin = 0.025, down_margin = 0.025):
     """
@@ -133,9 +148,6 @@ def add_jump_categories_3(df: pd.DataFrame, up_margin = 0.025, down_margin = 0.0
         float: up_margin - if a return is greater than this, classifed as 'up'
 
         float: down_margin - if a return is less than this, classified as 'down'.
-    
-    returns:
-        pd.DataFrame - the same DataFrame with a col 'jump' of type string
     """
     def jump_lookup(x):
         if x < -np.abs(down_margin):
@@ -163,9 +175,6 @@ def add_jump_categories_5(df: pd.DataFrame, big_down_margin = 0.025, small_down_
 
         all margins are floats, taken as absolute values, and interpreted the same as
         `add_jump_categories_3`
-
-    returns:
-        pd.DataFrame: the same DataFrame with a col 'jump' of type string
     """
 
     def jump_lookup(x):
