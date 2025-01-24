@@ -1,7 +1,18 @@
+"""
+To add features, add a function that takes in `df` (the dataframe with OHLC vol data)
+which creates a new column with this feature.
+
+Then, using the bottom function `add_features`, add a function call with `df` to add the 
+feature, making sure that any prerequisite features are there already. also add the name
+of the feature to the `cols` if the feature is to be lagged.
+
+NOTE: Do NOT drop any na - anything calling `add_features` will drop na's when needed
+"""
+
 import pandas as pd
 import numpy as np
 
-def add_vwap(df: pd.DataFrame) -> pd.DataFrame:
+def add_vwap(df: pd.DataFrame):
     """
     Given a dataframe with open, high, low, close, volume features, calculates the
     VWAP indicator for each row. Returns a new dataframe with a new column containing
@@ -13,11 +24,9 @@ def add_vwap(df: pd.DataFrame) -> pd.DataFrame:
     returns:
         pd DataFrame - a new df containing this new feature 
     """
-    df['VWAP'] = (((df['high'] + df['low'] + df['close']) / 3) * df['volume']).cumsum() / df['volume'].cumsum()
+    df['vwap'] = (((df['high'] + df['low'] + df['close']) / 3) * df['volume']).cumsum() / df['volume'].cumsum()
 
-    return df
-
-def add_ema(df: pd.DataFrame, period = 5, weighting_factor = 0.2) -> pd.DataFrame:
+def add_ema(df: pd.DataFrame, period = 5, weighting_factor = 0.2):
     """
     Given a dataframe, adds Exponential Moving Average (EMA) with specified period and weighting
     factor. 
@@ -40,9 +49,7 @@ def add_ema(df: pd.DataFrame, period = 5, weighting_factor = 0.2) -> pd.DataFram
     df['ema'] = ema
     df['ema'] = df['ema'].replace(0, np.nan)
 
-    return df
-
-def add_atr(df: pd.DataFrame, period = 14) -> pd.DataFrame:
+def add_atr(df: pd.DataFrame, period = 14):
     """
     Given a dataframe, adds Average True Range (ATR) according to a specified period.
 
@@ -72,9 +79,7 @@ def add_atr(df: pd.DataFrame, period = 14) -> pd.DataFrame:
     df['atr'] = atr
     df['atr'] = df['atr'].replace(0, np.nan)
 
-    return df
-
-def add_dow(df: pd.DataFrame) -> pd.DataFrame:
+def add_dow(df: pd.DataFrame):
     """
     Given a dataframe with a 'date' column in either '%d/%m/%y' or UNIX time (int), adds
     a new column with the day of the week
@@ -94,9 +99,7 @@ def add_dow(df: pd.DataFrame) -> pd.DataFrame:
 
     df['day_of_week'] = time.dt.day_name()
 
-    return df
-
-def add_return(df: pd.DataFrame) -> pd.DataFrame:
+def add_return(df: pd.DataFrame):
     """
     Given a dataframe with OHLC data, calculates percentage change in average price i.e. the return
     
@@ -114,7 +117,6 @@ def add_return(df: pd.DataFrame) -> pd.DataFrame:
         returns[idx] = prices.iloc[idx] / prices.iloc[idx - 1] - 1
     
     df['return'] = returns
-    return df
 
 def add_jump_categories_3(df: pd.DataFrame, up_margin = 0.025, down_margin = 0.025):
     """
@@ -145,7 +147,6 @@ def add_jump_categories_3(df: pd.DataFrame, up_margin = 0.025, down_margin = 0.0
     jump = jump.apply(jump_lookup)
 
     df['jump'] = jump
-    return df
 
 
 def add_jump_categories_5(df: pd.DataFrame, big_down_margin = 0.025, small_down_margin = 0.01,
@@ -181,4 +182,41 @@ def add_jump_categories_5(df: pd.DataFrame, big_down_margin = 0.025, small_down_
     jump = jump.apply(jump_lookup)
 
     df['jump'] = jump
-    return df
+
+
+def add_features(df: pd.DataFrame, session) -> list:
+    """
+    Use this function to add above features to the df
+
+    params:
+        df (pd.DataFrame) - the dataframe we are adding these features to
+
+        session - SessionInfo object containing information about current
+                session info, particularly the number of classes
+
+    returns:
+        a list of all feature names to be lagged
+    """
+    # first, add the target variable according to num_classes
+    add_return(df)
+
+    if session.num_classes == 3:
+        add_jump_categories_3(df, session.up_margin, session.down_margin)
+    elif session.num_classes == 5:
+        add_jump_categories_5(
+            df, session.big_down_margin, session.small_down_margin,
+            session.small_up_margin, session.big_up_margin
+        )
+    else:
+        raise(f'Could not add target variable, received num_classes {session.num_classes}')
+    
+    df['next_jump'] = df['jump'].shift(-1)
+
+    add_atr(df)
+    add_ema(df)
+    add_vwap(df)
+    add_dow(df) # one-hot encoding will be done elsewhere
+
+    cols = ['open', 'high', 'low', 'close', 'volume', 'atr', 'ema', 'vwap']
+
+    return cols
