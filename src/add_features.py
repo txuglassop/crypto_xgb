@@ -42,25 +42,24 @@ def add_features(df: pd.DataFrame, session) -> list:
 
     add_atr(df, period=12)
     add_atr(df, period=24)
-    add_atr(df, period=24*5) # 120
+    #add_atr(df, period=24*5) # 120
     add_ema(df, period=5)
     add_ema(df, period=24)
-    add_ema(df, period=24*5)
+    #add_ema(df, period=24*5)
     add_sma(df, window=5)
     add_sma(df, window=24)
-    add_sma(df, window=24*5)
+    #add_sma(df, window=24*5)
     df['atr_24_atr_12'] = df['atr_24'] - df['atr_12']
     df['ema_sma_5'] = df['ema_5'] - df['sma_5']
     df['ema_sma_24'] = df['ema_24'] - df['sma_24']
-    df['ema_sma_120'] = df['ema_120'] - df['sma_120']
+    #df['ema_sma_120'] = df['ema_120'] - df['sma_120']
     add_vwap(df)
     add_dow(df) # one-hot encoding will be done elsewhere
 
     cols = [
         'open', 'high', 'low', 'close', 'volume', 'return', 'log_return',
-        'atr_12', 'atr_24', 'atr_120', 'ema_5', 'ema_24', 'ema_120',
-        'sma_5', 'sma_24', 'sma_120', 'atr_24_atr_12', 'ema_sma_5',
-        'ema_sma_24', 'ema_sma_120'
+        'atr_12', 'atr_24', 'ema_5', 'ema_24', 'sma_5', 'sma_24',
+        'atr_24_atr_12', 'ema_sma_5', 'ema_sma_24'
     ]
 
     return cols
