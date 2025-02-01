@@ -46,6 +46,8 @@ def sort_and_check_data(path: str):
     for u,c in zip(unique, counts):
         print(f'Incr: {u}, Count: {c}')
 
+    df.to_csv(path, index=False)
+
 if __name__ == '__main__':
     path = sys.argv[1]
     add_headers_kline(path=path)
