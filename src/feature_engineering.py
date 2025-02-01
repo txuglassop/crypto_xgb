@@ -95,16 +95,16 @@ def add_atr(df: pd.DataFrame, period = 14):
 
 def add_dow(df: pd.DataFrame):
     """
-    Given a dataframe with a 'date' column in either '%d/%m/%y' or UNIX time (int), adds
+    Given a dataframe with a 'timestamp' column in either '%d/%m/%y' or UNIX time (int), adds
     a new column with the day of the week
 
     params:
         pd.DataFrame: df - dataframe as described above
     """
-    time = df['date']
+    time = df['timestamp']
 
-    if df.dtypes['date'] == int or df.dtypes['date'] == float:
-        time = pd.to_datetime(df['date'], unit='ms').dt.strftime('%d/%m/%Y')
+    if df.dtypes['timestamp'] == int or df.dtypes['timestamp'] == float:
+        time = pd.to_datetime(df['timestamp'], unit='ms').dt.strftime('%d/%m/%Y')
     
     time = pd.to_datetime(time, format='%d/%m/%Y')
 
