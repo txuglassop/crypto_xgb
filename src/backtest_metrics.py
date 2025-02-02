@@ -160,7 +160,7 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
 
     # trades information
     num_trades = np.sum(backtest_results['trades'] > 0)
-    win_rate = winning_trades.shape[0] / num_trades
+    win_rate = len(winning_trades) / (len(winning_trades) + len(losing_trades)) 
     avg_trade = np.average(trades_df['exit_price'] / trades_df['entry_price'] - 1)
 
     winning_trade_returns = winning_trades['exit_price'] / winning_trades['entry_price'] - 1
