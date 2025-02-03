@@ -123,6 +123,7 @@ def get_trades(backtest_results: pd.DataFrame) -> pd.DataFrame:
 
     return trades_df
 
+
 def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict:
     """
     Get metrics relevant to performance of strategy in backtest.
@@ -156,7 +157,7 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
     monthly_returns = get_monthly_returns(backtest_results['timestamp'], equity)
     avg_ann_return = np.mean(monthly_returns) * 12
     avg_ann_volatility = np.sqrt(variance(monthly_returns) * 12)
-    sharpe_ratio = avg_ann_return / avg_ann_volatility
+    sharpe_ratio = (avg_ann_return - rf_rate) / avg_ann_volatility
 
     # trades information
     num_trades = np.sum(backtest_results['trades'] > 0)
@@ -200,10 +201,10 @@ def get_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> dict
 
     return backtest_metrics
 
-def print_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> None:
+def get_backtest_metrics_string(backtest_results: pd.DataFrame, rf_rate = 0.04) -> str:
     metrics = get_backtest_metrics(backtest_results, rf_rate)
 
-    print(f'''
+    string = f'''
 ================ Backtest  Metrics ================
 
 ---------------- Test  Information ----------------
@@ -239,8 +240,12 @@ Avg. Winning Trade [%]:         {metrics['avg_winning_trade'] * 100:<10.2f}
 
 Worst Trade [%]:                {metrics['worst_trade'] * 100:<10.2f}
 Avg. Losing Trade [%]:          {metrics['avg_losing_trade'] * 100:<10.2f}
-''')
+'''
+    return string
 
+def print_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> None:
+    backtest_metrics_string = get_backtest_metrics_string(backtest_results, rf_rate)
+    print(backtest_metrics_string)
     classification_summary(backtest_results['actual'], backtest_results['predictions'])
     
 

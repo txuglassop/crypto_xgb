@@ -54,12 +54,17 @@ def add_features(df: pd.DataFrame, session) -> list:
     df['ema_sma_24'] = df['ema_24'] - df['sma_24']
     #df['ema_sma_120'] = df['ema_120'] - df['sma_120']
     add_vwap(df)
+
+    add_vol_sma(df, window=7)
+    add_vol_sma(df, window=24)
+
     add_dow(df) # one-hot encoding will be done elsewhere
 
     cols = [
         'open', 'high', 'low', 'close', 'volume', 'return', 'log_return',
         'atr_12', 'atr_24', 'ema_5', 'ema_24', 'sma_5', 'sma_24',
-        'atr_24_atr_12', 'ema_sma_5', 'ema_sma_24'
+        'atr_24_atr_12', 'ema_sma_5', 'ema_sma_24', 'vwap', 'sma_vol_7',
+        'sma_vol_24'
     ]
 
     return cols

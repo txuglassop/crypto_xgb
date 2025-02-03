@@ -6,7 +6,8 @@ def check_data(path: str):
     """
     runs some checks on the data given by `path`. this includes
     checking if the `timestamp` feature is ordered, the increments
-    within the `timestamp` feature and their frequency
+    within the `timestamp` feature and their frequency, any duplicate
+    rows
 
     params:
         path (str): path to the file (data)
@@ -20,10 +21,14 @@ def check_data(path: str):
 
     l = df['timestamp']
     if all(l[i] <= l[i+1] for i in range(len(l) - 1)):
-        print('Data is sorted')
+        print('Data is sorted\n')
     else:
         print('Data is NOT sorted - please check timestamp feature')
-    
+
+    duplicates = df.duplicated()
+    num_dup = np.sum(duplicates)
+    print(f'There are {num_dup} duplicate rows\n')
+
     incr = np.diff(l)
     unique, counts = np.unique(incr, return_counts=True)
 

@@ -64,6 +64,24 @@ def add_sma(df: pd.DataFrame, window = 7):
     df[name] = sma
     df[name] = df[name].replace(0, np.nan)
         
+def add_vol_sma(df: pd.DataFrame, window = 7):
+    """
+    Adds a simple moving average for volume, taking `window` entries into account
+
+    params:
+        df (pd.DataFrame)
+        window (int) - the number of entries to take the average of. includes the
+            current row and the past `window-1` entries.
+    """
+    volume = df['volume']
+    sma = np.zeros(len(volume))
+    for idx in range(window - 1, len(volume)):
+        sma[idx] = np.mean(volume[idx-window+1:idx+1])
+
+    name = 'sma_vol_' + str(window)
+
+    df[name] = sma
+    df[name] = df[name].replace(0, np.nan)
 
 def add_atr(df: pd.DataFrame, period = 14):
     """

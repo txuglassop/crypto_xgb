@@ -3,10 +3,14 @@ Use this class to keep track of session info and ultimately log backtest results
 with all key info
 """
 import numpy as np
+import pandas as pd
 from datetime import datetime
 from pathlib import Path
 from textwrap import fill
 import os
+
+from backtest_metrics import get_backtest_metrics_string
+from sklearn.metrics import classification_report, confusion_matrix
 
 class SessionInfo():
     def __init__(
@@ -41,8 +45,9 @@ class SessionInfo():
     def add_strategy(self, strategy: str):
         self.strategy = strategy
 
-    def add_backtest(self, backtest_results):
+    def add_backtest(self, backtest_results: pd.DataFrame):
         self.backtest_results = backtest_results
+        self.backtest_results.__name__ = self.strategy
 
     def _get_session_info_string(self):
         features = fill(", ".join(self.features), width=50, subsequent_indent="")
@@ -74,13 +79,30 @@ Down Margin:                    {self.down_margin}
             `path_to_output` (str) - a path to where the session is to be logged
         """
         # make new directory
-        os.makedirs(path_to_output, exist_ok=True)
-
         time = datetime.now().strftime('%H:%M:%S')
-        filename = self.strategy + time + '.txt'
-        results_path = os.path.join(path_to_output, filename)
+        dirname = path_to_output + '/' + self.strategy + '_' + time
+        os.makedirs(dirname, exist_ok=True)
 
-        with open(results_path, 'w') as results:
-            results.write(self._get_session_info_string())
+        filename = 'summary.txt'
+        summary_path = os.path.join(dirname, filename)
+
+        class_report_string = f'''
+-------------- Classification Report --------------
+{classification_report(self.backtest_results['actual'], self.backtest_results['predictions'])}
+
+---------------- Confusion Matrix ----------------
+{confusion_matrix(self.backtest_results['actual'], self.backtest_results['predictions'])}
+'''
+
+        with open(summary_path, 'w') as f:
+            f.write(self._get_session_info_string())
+            f.write(get_backtest_metrics_string(self.backtest_results))
+            f.write(class_report_string)
+
+        self.backtest_results.to_csv(dirname + '/backtest.csv')
+
+        
+
+            
 
 

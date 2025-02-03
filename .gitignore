@@ -5,8 +5,10 @@ input/*
 notebooks/*
 !notebooks/wf.ipynb
 
-backtests/*
+#backtests/*
 
-!backtests/
+#!backtests/
 
 .vscode/
+
+scrap.txt
