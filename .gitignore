@@ -2,6 +2,7 @@
 
 input/*
 !BTCUSDT_1h_2020_2024_final.csv
+!ETHUSDT_1h_2020_2024_join_final.csv
 
 notebooks/*
 !notebooks/wf.ipynb
