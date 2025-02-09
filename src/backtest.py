@@ -136,3 +136,6 @@ class Backtest():
         results.__name__ = strategy.__name__
 
         return results
+
+if __name__ == '__main__':
+    print('ok')

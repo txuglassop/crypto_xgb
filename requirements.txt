@@ -5,4 +5,5 @@ seaborn
 scikit-learn
 xgboost
 optuna
+optuna-integration
 plotly
