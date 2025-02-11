@@ -41,6 +41,9 @@ class SessionInfo():
 
     def add_features(self, features: list):
         self.features = features
+
+    def add_metric(self, metric: str):
+        self.metric = metric
     
     def add_strategy(self, strategy: str):
         self.strategy = strategy

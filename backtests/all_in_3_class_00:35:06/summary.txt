@@ -1,0 +1,99 @@
+
+================== Session Info ==================
+
+Data:                           BTCUSDT_1h_2020_2024_final.csv
+Num Classes:                    3
+Lag Factor:                     5
+Test Size:                      0.2
+
+Up Margin:                      0.008
+Down Margin:                    0.005
+
+
+-------------------- Features --------------------
+
+open, high, low, close, volume, base_asset_volume,
+no_trades, taker_buy_vol,
+taker_buy_base_asset_vol, return, log_return,
+atr_12, atr_24, ema_5, ema_24, sma_5, sma_24,
+atr_24_atr_12, ema_sma_5, ema_sma_24, vwap,
+sma_vol_7, sma_vol_24, dow_Monday, dow_Saturday,
+dow_Sunday, dow_Thursday, dow_Tuesday,
+dow_Wednesday, open_1, high_1, low_1, close_1,
+volume_1, return_1, log_return_1, atr_12_1,
+atr_24_1, ema_5_1, ema_24_1, sma_5_1, sma_24_1,
+atr_24_atr_12_1, ema_sma_5_1, ema_sma_24_1,
+vwap_1, sma_vol_7_1, sma_vol_24_1, open_2, high_2,
+low_2, close_2, volume_2, return_2, log_return_2,
+atr_12_2, atr_24_2, ema_5_2, ema_24_2, sma_5_2,
+sma_24_2, atr_24_atr_12_2, ema_sma_5_2,
+ema_sma_24_2, vwap_2, sma_vol_7_2, sma_vol_24_2,
+open_3, high_3, low_3, close_3, volume_3,
+return_3, log_return_3, atr_12_3, atr_24_3,
+ema_5_3, ema_24_3, sma_5_3, sma_24_3,
+atr_24_atr_12_3, ema_sma_5_3, ema_sma_24_3,
+vwap_3, sma_vol_7_3, sma_vol_24_3, open_4, high_4,
+low_4, close_4, volume_4, return_4, log_return_4,
+atr_12_4, atr_24_4, ema_5_4, ema_24_4, sma_5_4,
+sma_24_4, atr_24_atr_12_4, ema_sma_5_4,
+ema_sma_24_4, vwap_4, sma_vol_7_4, sma_vol_24_4,
+open_5, high_5, low_5, close_5, volume_5,
+return_5, log_return_5, atr_12_5, atr_24_5,
+ema_5_5, ema_24_5, sma_5_5, sma_24_5,
+atr_24_atr_12_5, ema_sma_5_5, ema_sma_24_5,
+vwap_5, sma_vol_7_5, sma_vol_24_5, jump_neutral,
+jump_up
+
+
+================ Backtest  Metrics ================
+
+---------------- Test  Information ----------------
+
+Start:                          2024-01-02 10:00:00
+End:                            2025-01-01 09:00:00
+Duration:                       364 days, 23 hours, 0 mins, 0 seconds
+
+---------------- Strategy Metrics -----------------
+
+Strategy:                       all_in_3_class
+
+Exposure:                       0.3744292237442922
+Initial Equity:                 500000.00 
+Equity High:                    928970.02 
+Equity Low:                     483015.42 
+Final Equity:                   822219.30 
+
+Return (ann.) [%]:              53.96     
+Buy & Hold Return (ann.) [%]:   115.08    
+Volatility (ann.) [%]:          27.93     
+Sharpe Ratio (R=4.00%): 1.79      
+
+----------------- Trade  Metrics ------------------
+
+Num. Trades:                    2         
+Win Rate [%]:                   52.94     
+Avg. Trade [%]:                 37.29     
+Avg. Trade Duration:            1685.470588235294 hours
+
+Best Trade [%]:                 71.09     
+Avg. Winning Trade [%]:         71.09     
+
+Worst Trade [%]:                -0.72     
+Avg. Losing Trade [%]:          -0.72     
+
+-------------- Classification Report --------------
+              precision    recall  f1-score   support
+
+           0       0.50      0.00      0.00       697
+           1       0.89      1.00      0.94      7756
+           2       0.60      0.01      0.02       307
+
+    accuracy                           0.89      8760
+   macro avg       0.66      0.34      0.32      8760
+weighted avg       0.85      0.89      0.83      8760
+
+
+---------------- Confusion Matrix ----------------
+[[   1  695    1]
+ [   1 7754    1]
+ [   0  304    3]]

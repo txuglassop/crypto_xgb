@@ -16,3 +16,6 @@ env/*
 .vscode/
 
 scrap.txt
+
+optuna.db
+**/optuna.db
