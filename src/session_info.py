@@ -79,8 +79,8 @@ Down Margin:                    {self.down_margin}
             `path_to_output` (str) - a path to where the session is to be logged
         """
         # make new directory
-        time = datetime.now().strftime('%H:%M:%S')
-        dirname = path_to_output + '/' + self.strategy + '_' + time
+        time = datetime.now().strftime('%d-%m-%y_%H:%M:%S')
+        dirname = path_to_output + self.strategy + '_' + time
         os.makedirs(dirname, exist_ok=True)
 
         filename = 'summary.txt'
