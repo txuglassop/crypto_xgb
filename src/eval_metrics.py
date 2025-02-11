@@ -11,7 +11,7 @@ score is better
 import numpy as np
 import xgboost as xgb
 
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, fbeta_score
 
 
 def f1_weighted_eval(predt: np.ndarray, dtrain: xgb.DMatrix):
@@ -20,3 +20,11 @@ def f1_weighted_eval(predt: np.ndarray, dtrain: xgb.DMatrix):
     
     f1 = f1_score(y_true, y_pred, average='macro')
     return 'f1_weighted_eval', f1
+
+def fbeta_eval(predt: np.ndarray, dtrain: xgb.DMatrix):
+    y_true = dtrain.get_label()
+    y_pred = np.argmax(predt, axis=1)
+
+    fbeta = fbeta_score(y_true, y_pred, beta=0.5, average='macro')
+
+    return 'fbeta_eval', fbeta

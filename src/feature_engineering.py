@@ -55,30 +55,27 @@ def add_sma(df: pd.DataFrame, window = 7):
             current row and the past `window-1` entries.
     """
     prices = np.divide(np.add(np.add(df['high'], df['low']), df['close']),3)
-    sma = np.zeros(len(prices))
-    for idx in range(window - 1, len(prices)):
-        sma[idx] = np.mean(prices[idx-window+1:idx+1])
+    sma = prices.rolling(window=window).mean()
 
     name = 'sma_' + str(window)
 
     df[name] = sma
     df[name] = df[name].replace(0, np.nan)
         
-def add_vol_sma(df: pd.DataFrame, window = 7):
+def add_sma_feature(df: pd.DataFrame, feature_name: str, window = 7):
     """
-    Adds a simple moving average for volume, taking `window` entries into account
+    Adds a simple moving average for a feature already in `df` 
 
     params:
         df (pd.DataFrame)
+        feature_name (str): the name of the feature as a string
         window (int) - the number of entries to take the average of. includes the
             current row and the past `window-1` entries.
     """
-    volume = df['volume']
-    sma = np.zeros(len(volume))
-    for idx in range(window - 1, len(volume)):
-        sma[idx] = np.mean(volume[idx-window+1:idx+1])
+    feature = df[feature_name]
+    sma = feature.rolling(window=window).mean()
 
-    name = 'sma_vol_' + str(window)
+    name = 'sma_' + feature_name + '_' + str(window)
 
     df[name] = sma
     df[name] = df[name].replace(0, np.nan)
