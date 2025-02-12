@@ -6,7 +6,6 @@ from plotly.subplots import make_subplots
 
 from datetime import datetime
 from statistics import variance
-from textwrap import dedent
 
 from utility_functions import get_monthly_returns, classification_summary
 
@@ -246,6 +245,16 @@ Avg. Losing Trade [%]:          {metrics['avg_losing_trade'] * 100:<10.2f}
 def print_backtest_metrics(backtest_results: pd.DataFrame, rf_rate = 0.04) -> None:
     backtest_metrics_string = get_backtest_metrics_string(backtest_results, rf_rate)
     print(backtest_metrics_string)
-    classification_summary(backtest_results['actual'], backtest_results['predictions'])
-    
+    classification_summary(backtest_results['predictions'], backtest_results['actual'])
+
+
+import sys
+if __name__ == '__main__':
+    path = sys.argv[1]
+    if path[-1] != '/':
+        path = path + '/'
+    backtest_results = pd.read_csv(path + 'backtest.csv')
+    plot_backtest(backtest_results)
+
+
 
