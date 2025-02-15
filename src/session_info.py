@@ -80,7 +80,7 @@ Down Margin:                    {self.down_margin}
         """
         # make new directory
         time = datetime.now().strftime('%d-%m-%y_%H:%M:%S')
-        dirname = path_to_output + self.strategy + '_' + time
+        dirname = path_to_output + self.data.split('_')[0] + '_' + time
         os.makedirs(dirname, exist_ok=True)
 
         filename = 'summary.txt'

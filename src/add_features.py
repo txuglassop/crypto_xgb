@@ -11,9 +11,10 @@ import pandas as pd
 from feature_engineering import *
 
 
-def add_features(df: pd.DataFrame, session) -> list:
+def add_features(df: pd.DataFrame, session):
     """
-    Use this function to add above features to the df
+    Use this function to add above features to the df. make sure to do all
+    necessary preprocessing such as one-hot encoding etc.
 
     params:
         df (pd.DataFrame) - the dataframe we are adding these features to
@@ -22,6 +23,7 @@ def add_features(df: pd.DataFrame, session) -> list:
                 session info, particularly the number of classes
 
     returns:
+        a new dataframe with all new features already one-hot encoded etc.,
         a list of all feature names to be lagged
     """
     # first, add the target variable according to num_classes
@@ -39,6 +41,7 @@ def add_features(df: pd.DataFrame, session) -> list:
         raise ValueError(f'Could not add target variable, received num_classes {session.num_classes}')
     
     df['next_jump'] = df['jump'].shift(-1)
+    df = pd.get_dummies(df, columns=['jump'], prefix='jump', drop_first=True)
 
     add_atr(df, period=12)
     add_atr(df, period=24)
@@ -52,10 +55,28 @@ def add_features(df: pd.DataFrame, session) -> list:
     add_sma(df, window=24)
     add_sma(df, window=24*5) # 120
 
+    add_vidya(df, window=5)
+    add_vidya(df, window=24)
+    add_vidya(df, window=24*5) #120
+
+    add_cmo(df, window=5)
+    add_cmo(df, window=12)
+    add_cmo(df, window=24)
+    add_cmo(df, window=120)
+
+    #add_cmf(df, window=5)
+    #add_cmf(df, window=12)
+    #add_cmf(df, window=24)
+    #add_cmf(df, window=120)
+
     df['atr_24_atr_12'] = df['atr_24'] - df['atr_12']
     df['ema_sma_5'] = df['ema_5'] - df['sma_5']
     df['ema_sma_24'] = df['ema_24'] - df['sma_24']
     df['ema_sma_120'] = df['ema_120'] - df['sma_120']
+    df['vidya_ema_5'] = df['vidya_5'] - df['ema_5']
+    df['vidya_ema_24'] = df['vidya_24'] - df['ema_24']
+    df['vidya_ema_120'] = df['vidya_120'] - df['ema_120']
+
 
     add_vwap(df)
     add_sma_feature(df, 'vwap', window=7)
@@ -68,13 +89,13 @@ def add_features(df: pd.DataFrame, session) -> list:
     add_sma_feature(df, 'volume', window=7)
     add_sma_feature(df, 'volume', window=24)
 
-    add_dow(df) # one-hot encoding will be done elsewhere
+    add_dow(df)
+    df = pd.get_dummies(df, columns=['day_of_week'], prefix='dow', drop_first=True)
 
     cols = [
-        'open', 'high', 'low', 'close', 'volume', 'return', 'log_return',
-        'atr_12', 'atr_24', 'atr_120', 'ema_5', 'ema_24', 'ema_120', 'sma_5', 'sma_24', 'sma_120',
-        'atr_24_atr_12', 'ema_sma_5', 'ema_sma_24', 'ema_sma_120', 'vwap', 'sma_vwap_7', 'sma_vwap_24',
+        'open', 'high', 'low', 'close', 'volume', 'return', 'log_return', 'jump_neutral', 'jump_up',
+        'atr_12', 'atr_24', 'atr_120', 'ema_5', 'ema_24', 'ema_120', 'sma_5', 'sma_24', 'sma_120', 'vwap',
         'vwap_price', 'return_log_return', 'sma_volume_7', 'sma_volume_24'
     ]
 
-    return cols
+    return df, cols
