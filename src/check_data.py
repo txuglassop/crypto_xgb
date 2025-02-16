@@ -3,7 +3,7 @@ import numpy as np
 import sys
 import time
 
-def check_data(path: str):
+def check_data(df: pd.DataFrame):
     """
     runs some checks on the data given by `path`. this includes
     checking if the `timestamp` feature is ordered, the increments
@@ -13,12 +13,8 @@ def check_data(path: str):
     params:
         path (str): path to the file (data)
     """
-    try: 
-        df = pd.read_csv(path)
-    except:
-        raise ValueError(f'Cannot find {path}')
 
-    print(f'\n>>> Running data check on {path} <<<')
+    print(f'\n>>> Running data check <<<')
 
     l = df['timestamp']
     if all(l[i] <= l[i+1] for i in range(len(l) - 1)):
