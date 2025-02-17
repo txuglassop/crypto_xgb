@@ -6,6 +6,7 @@ input/*
 
 notebooks/*
 !notebooks/wf.ipynb
+!notebooks/btcusdt_30m.ipynb
 
 env/*
 

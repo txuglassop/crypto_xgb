@@ -84,6 +84,7 @@ def add_features(df: pd.DataFrame, session):
 
     df['vwap_price'] = (df['high'] + df['low'] + df['close']) / 3 - df['vwap']
     df['return_log_return'] = df['return'] - df['log_return']
+    df['high_over_low'] = df['high'] / df['low']
 
 
     add_sma_feature(df, 'volume', window=7)
@@ -94,8 +95,18 @@ def add_features(df: pd.DataFrame, session):
 
     cols = [
         'open', 'high', 'low', 'close', 'volume', 'return', 'log_return', 'jump_neutral', 'jump_up',
+        'base_asset_volume', 'no_trades', 'taker_buy_vol', 'taker_buy_base_asset_vol',
         'atr_12', 'atr_24', 'atr_120', 'ema_5', 'ema_24', 'ema_120', 'sma_5', 'sma_24', 'sma_120', 'vwap',
-        'vwap_price', 'return_log_return', 'sma_volume_7', 'sma_volume_24'
+        'vwap_price', 'return_log_return', 'high_over_low' 'sma_volume_7', 'sma_volume_24'
     ]
 
-    return df, cols
+    df = df.dropna()
+    for lag in range(1, session.lag_factor+1):
+        for col in cols:
+            newcol = np.zeros(df.shape[0]) * np.nan
+            newcol[lag:] = df[col].values[:-lag]
+            df.insert(len(df.columns), "{0}_{1}".format(col, lag), newcol)
+
+    df = df.dropna()
+
+    return df

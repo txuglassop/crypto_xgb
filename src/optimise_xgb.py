@@ -1,12 +1,15 @@
 import pandas as pd
 import xgboost as xgb
+import optuna
 from optuna import create_study, logging
 from optuna.pruners import MedianPruner
 from optuna.integration import XGBoostPruningCallback
+from optuna.samplers import TPESampler
 
 import warnings
 warnings.filterwarnings('ignore')
 
+optuna.logging.set_verbosity(optuna.logging.WARNING) 
 
 # The following Optuna Optimisation call is heavily insprired by JP (@para24) on Kaggle, see:
 # https://www.kaggle.com/code/para24/xgboost-stepwise-tuning-using-optuna/notebook#7.-Stepwise-Hyperparameter-Tuning
@@ -15,6 +18,7 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
     """
     `X` and `y` MUST be pd.DataFrames - NOT `xgb.DMatrix`.  
     """
+    warnings.filterwarnings('ignore')
     dtrain = xgb.DMatrix(X, label=y)
 
     # initial learning params
@@ -22,6 +26,7 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
     params['learning_rate'] = 0.01
     params['objective'] = 'multi:softprob'
     params['num_class'] = num_classes
+    params['gamma'] = 1e-3
 
     if group == '1':
         params['max_depth'] = trial.suggest_int('max_depth', 2, 30)
@@ -37,6 +42,9 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
         params['num_boost_round'] = num_boost_round
         params['learning_rate'] = learning_rate
 
+    if group == '4':
+        params['gamma'] = trial.suggest_loguniform('gamma', 1e-3, 19)
+
     pruning_callback = XGBoostPruningCallback(trial, 'test-' + score.__name__)
 
     cv_scores = xgb.cv(params, dtrain, nfold=5,
@@ -48,18 +56,22 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
     
     return cv_scores['test-' + score.__name__ + '-mean'].values[-1]
 
-def _execute_optimisation(X_train, y_train, num_classes, study_name, group, score, trials, params=dict(), direction='maximize'):
+def _execute_optimisation(X_train, y_train, num_classes, study_name, group, score, trials, data:str, params=dict(), direction='maximize',):
     logging.set_verbosity(logging.ERROR)
 
     ## use pruner to skip trials that aren't doing so well
-    pruner = MedianPruner(n_warmup_steps=5)
+    pruner = MedianPruner(n_warmup_steps=10)
+
+    ## use sampler to use past results from db
+    sampler = TPESampler(n_startup_trials=20, multivariate=True)
 
     study = create_study(
         direction=direction,
         study_name=study_name,
-        storage='sqlite:///optuna.db',
+        storage=f'sqlite:///optuna_{data}.db',
         load_if_exists=True,
-        pruner=pruner
+        pruner=pruner,
+        sampler=sampler
     )
 
     study.optimize(
@@ -81,7 +93,7 @@ def _execute_optimisation(X_train, y_train, num_classes, study_name, group, scor
 
     return study.best_params
 
-def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_classes: int, eval_metric: callable, trials=9) -> dict:
+def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_classes: int, eval_metric: callable, data: str, trials=9) -> dict:
     """
     Execute stepwise optimisation to find optimal CV parameters for XGBoost given the train set. 
 
@@ -100,10 +112,10 @@ def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_clas
         a dictionary containing optimal parameters
     """
     final_params = dict()
-    for g in ['1', '2', '3']:
+    for g in ['1', '2', '3', '4']:
         print(f'====== Optimising Group {g} ======')
         update_params = _execute_optimisation(
-            X_train, y_train, num_classes, 'xgboost', g, eval_metric, trials, params=final_params, direction='maximize'
+            X_train, y_train, num_classes, 'xgboost', g, eval_metric, trials, data, params=final_params, direction='maximize',
         )
         final_params.update(update_params)
         print(f'Params after updating group {g}: ', final_params)
