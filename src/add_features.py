@@ -64,10 +64,10 @@ def add_features(df: pd.DataFrame, session):
     add_cmo(df, window=24)
     add_cmo(df, window=120)
 
-    #add_cmf(df, window=5)
-    #add_cmf(df, window=12)
-    #add_cmf(df, window=24)
-    #add_cmf(df, window=120)
+    add_cmf(df, window=5)
+    add_cmf(df, window=12)
+    add_cmf(df, window=24)
+    add_cmf(df, window=120)
 
     df['atr_24_atr_12'] = df['atr_24'] - df['atr_12']
     df['ema_sma_5'] = df['ema_5'] - df['sma_5']
@@ -97,7 +97,7 @@ def add_features(df: pd.DataFrame, session):
         'open', 'high', 'low', 'close', 'volume', 'return', 'log_return', 'jump_neutral', 'jump_up',
         'base_asset_volume', 'no_trades', 'taker_buy_vol', 'taker_buy_base_asset_vol',
         'atr_12', 'atr_24', 'atr_120', 'ema_5', 'ema_24', 'ema_120', 'sma_5', 'sma_24', 'sma_120', 'vwap',
-        'vwap_price', 'return_log_return', 'high_over_low' 'sma_volume_7', 'sma_volume_24'
+        'vwap_price', 'return_log_return', 'high_over_low', 'sma_volume_7', 'sma_volume_24'
     ]
 
     df = df.dropna()

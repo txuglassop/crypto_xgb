@@ -309,4 +309,19 @@ def add_cmf(df, window: int=5):
 
     name = 'cmf_' + str(window)
     df[name] = cmf
-    
+
+def add_rsi(df: pd.DataFrame, window: int=5):
+    change = df['close'].diff()
+    change_up = change.copy()
+    change_down = change.copy()
+
+    change_up[change_up<0] = 0
+    change_down[change_down>0] = 0
+
+    avg_up = change_up.rolling(window).mean()
+    avg_down = change_down.rolling(window).mean()
+
+    rsi = 100 * avg_up / (avg_up + avg_down)
+
+    name = 'rsi_' + str(window)
+    df[name] = rsi
