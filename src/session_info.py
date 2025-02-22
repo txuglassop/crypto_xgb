@@ -41,6 +41,9 @@ class SessionInfo():
 
     def add_features(self, features: list):
         self.features = features
+
+    def add_params(self, params: dict):
+        self.params = params
     
     def add_strategy(self, strategy: str):
         self.strategy = strategy
@@ -51,6 +54,7 @@ class SessionInfo():
 
     def _get_session_info_string(self):
         features = fill(", ".join(self.features), width=50, subsequent_indent="")
+        params = """{}""".format("\n".join(f"{n} : {v}" for n, v in self.params.items()))
         string = f"""
 ================== Session Info ==================
 
@@ -67,6 +71,10 @@ Down Margin:                    {self.down_margin}
 
 {features}
 
+------------------- Parameters -------------------
+
+{params}
+
 """
         return string
 
@@ -80,7 +88,10 @@ Down Margin:                    {self.down_margin}
         """
         # make new directory
         time = datetime.now().strftime('%d-%m-%y_%H:%M:%S')
-        dirname = path_to_output + self.data.split('_')[0] + '_' + time
+        split = self.data.split('_')
+        symbol = split[0]
+        interval = split[1]
+        dirname = path_to_output + symbol + '_' + interval + '_' + time
         os.makedirs(dirname, exist_ok=True)
 
         filename = 'summary.txt'
