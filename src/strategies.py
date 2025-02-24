@@ -1,7 +1,7 @@
 """
 Generic strategy declaration:
 
-def strategy(next_prediction: int, price: float, current_pos: float, current_capital: float) -> int:
+def strategy(next_prediction: int, price: float, current_pos: float, current_capital: float, delta: float) -> int:
     pass
 
 A `strategy` method must take 4 parameters and return an integer:
@@ -18,24 +18,15 @@ A `strategy` method must take 4 parameters and return an integer:
             `strategy` method to decide whether purchasing a coin is appropriate/possible
             given the current capital.
         
+        float: `delta` - the delta of our trade i.e. the change in our position since we entered
+            the trade - use this for take-profits and stop-losses.
+        
     return:
         int: an integer representing the change in position. For example, `+1` would be to buy
             1 coin, `-3` would be to sell 3 coins, and `0` is to do nothing.    
 
 """
-
-def basic_3_class_strategy(next_prediction: int, price: float, current_pos: float, current_capital: float) -> int:
-    """
-    If predicted up, then `+1`, if predicted down, then sell everything, otherwise do nothing (`0`)
-    """
-    if next_prediction == 0:
-        return -current_pos
-    elif next_prediction == 2 and current_capital > price:
-        return +1
-    else:
-        return 0
-    
-def all_in_3_class(next_prediction: int, price: float, current_pos: float, current_capital: float) -> int:
+def all_in_3_class(next_prediction: int, price: float, current_pos: float, current_capital: float, delta: float) -> int:
     """
     If predicted up, then buy all possible, if predicted down, sell everything
     """
@@ -45,8 +36,20 @@ def all_in_3_class(next_prediction: int, price: float, current_pos: float, curre
         return current_capital // price
     else:
         return 0
+    
+def stop_loss_3_class(next_prediction: int, price: float, current_pos: float, current_capital: float, delta: float) -> int:
+    """
+    If predicted up, then buy all possible, if predicted down OR our delta has crossed over our stop loss, sell everything
+    """
+    stop_loss = -0.08 # -8% stop loss
+    if next_prediction == 0 or delta < stop_loss:
+        return -current_pos
+    elif next_prediction == 2:
+        return current_capital // price
+    else:
+        return 0
 
-def short_3_class(next_prediction: int, price: float, current_pos: float, current_capital: float) -> int:
+def short_3_class(next_prediction: int, price: float, current_pos: float, current_capital: float, delta: float) -> int:
     """
     If predicted down, go short, where we can by 80% of capital. If up, return to neutral.
     """
@@ -57,7 +60,7 @@ def short_3_class(next_prediction: int, price: float, current_pos: float, curren
     else:
         return 0
     
-def L_S_5_class(next_prediction: int, price: float, current_pos: float, current_capital: float) -> int:
+def L_S_5_class(next_prediction: int, price: float, current_pos: float, current_capital: float, delta: float) -> int:
     """
     If predicted big_up, go as long as possible. If predicted big_down, go as 80% short. Exit position
     if predicted in opposite direction

@@ -11,6 +11,9 @@ warnings.filterwarnings('ignore')
 
 optuna.logging.set_verbosity(optuna.logging.WARNING) 
 
+# number of jobs for optimisation
+N_JOBS = 1
+
 # The following Optuna Optimisation call is heavily insprired by JP (@para24) on Kaggle, see:
 # https://www.kaggle.com/code/para24/xgboost-stepwise-tuning-using-optuna/notebook#7.-Stepwise-Hyperparameter-Tuning
 
@@ -18,15 +21,8 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
     """
     `X` and `y` MUST be pd.DataFrames - NOT `xgb.DMatrix`.  
     """
-    warnings.filterwarnings('ignore')
     dtrain = xgb.DMatrix(X, label=y)
 
-    # initial learning params
-    params['num_boost_round'] = 200
-    params['learning_rate'] = 0.01
-    params['objective'] = 'multi:softprob'
-    params['num_class'] = num_classes
-    params['gamma'] = 1e-3
 
     if group == '1':
         params['max_depth'] = trial.suggest_int('max_depth', 2, 30)
@@ -37,17 +33,18 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
         params['colsample_bytree'] = trial.suggest_uniform('colsample_bytree', 0, 1)
 
     if group == '3':
-        num_boost_round = trial.suggest_int('num_boost_round', 100, 400)
-        learning_rate = trial.suggest_uniform('learning_rate', 0.005, 0.1)
-        params['num_boost_round'] = num_boost_round
-        params['learning_rate'] = learning_rate
+        params['num_boost_round'] = trial.suggest_int('num_boost_round', 100, 400)
+        params['learning_rate'] = trial.suggest_uniform('learning_rate', 0.005, 0.1)
 
     if group == '4':
         params['gamma'] = trial.suggest_loguniform('gamma', 1e-3, 19)
 
     pruning_callback = XGBoostPruningCallback(trial, 'test-' + score.__name__)
 
-    cv_scores = xgb.cv(params, dtrain, nfold=5,
+    xgb_params = params.copy()
+    del xgb_params['num_boost_round']
+
+    cv_scores = xgb.cv(xgb_params, dtrain, nfold=5,
                        stratified=True,
                        feval=score,
                        num_boost_round=params['num_boost_round'],
@@ -57,13 +54,11 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
     return cv_scores['test-' + score.__name__ + '-mean'].values[-1]
 
 def _execute_optimisation(X_train, y_train, num_classes, study_name, group, score, trials, data:str, params=dict(), direction='maximize',):
-    logging.set_verbosity(logging.ERROR)
-
     ## use pruner to skip trials that aren't doing so well
-    pruner = MedianPruner(n_warmup_steps=10)
+    pruner = MedianPruner(n_warmup_steps=20)
 
     ## use sampler to use past results from db
-    sampler = TPESampler(n_startup_trials=20, multivariate=True)
+    sampler = TPESampler(n_startup_trials=20, multivariate=True, warn_independent_sampling=False)
 
     study = create_study(
         direction=direction,
@@ -77,7 +72,7 @@ def _execute_optimisation(X_train, y_train, num_classes, study_name, group, scor
     study.optimize(
         lambda trial: _objective(trial, X_train, y_train, num_classes, group, score, params),
         n_trials=trials,
-        n_jobs=1
+        n_jobs=N_JOBS
     )
 
     print('STUDY NAME: ', study_name)
@@ -91,7 +86,10 @@ def _execute_optimisation(X_train, y_train, num_classes, study_name, group, scor
     print('BEST TRIAL', study.best_trial)
     print('-------------------------------------------------------')
 
-    return study.best_params
+    updated_params = params.copy()
+    updated_params.update(study.best_params)
+
+    return updated_params
 
 def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_classes: int, eval_metric: callable, data: str, trials=9) -> dict:
     """
@@ -112,6 +110,13 @@ def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_clas
         a dictionary containing optimal parameters
     """
     final_params = dict()
+
+    # initial learning params
+    final_params['num_boost_round'] = 200
+    final_params['learning_rate'] = 0.01
+    final_params['objective'] = 'multi:softprob'
+    final_params['num_class'] = num_classes
+
     for g in ['1', '2', '3', '4']:
         print(f'====== Optimising Group {g} ======')
         update_params = _execute_optimisation(

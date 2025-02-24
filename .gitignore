@@ -10,7 +10,7 @@ notebooks/*
 
 env/*
 
-#backtests/*
+backtests/*
 
 #!backtests/
 

@@ -50,7 +50,7 @@ class Backtest():
         self.starting_capital = starting_capital
         self.commission = commission
 
-    def run_backtest(self, strategy: Callable[[int, float, int, float], int],
+    def run_backtest(self, strategy: Callable[[int, float, int, float, float], int],
                      retrain = True, train_frequency = 7, progress_bar = True):
         """
         Run a backtest using the provided variables when the class was declared and according to
@@ -92,6 +92,8 @@ class Backtest():
         capital = np.zeros(X_test.shape[0])
         predictions = np.zeros(X_test.shape[0])
         current_capital = self.starting_capital
+        delta = 0.0
+        buy_price = 0.0
 
         print('-------------------- Starting backtest --------------------\n')
 
@@ -110,8 +112,24 @@ class Backtest():
                 raise ValueError(f'Error in training/predicting at index {idx} of {len(trades)}')
 
             predictions[idx] = next_prediction
-            trades[idx] = strategy(next_prediction, X_test.iloc[[idx]]['close'].values[0], np.sum(trades), current_capital)
-            cost_of_trade = trades[idx] * X_test.iloc[[idx]]['close'].values[0]
+            cur_price = X_test.iloc[[idx]]['close'].values[0]
+
+            # if we are currently long, find our current delta
+            if np.sum(trades) > 0:
+                delta = cur_price / buy_price - 1
+
+            trade = strategy(next_prediction, cur_price, np.sum(trades), current_capital, delta)
+            trades[idx] = trade
+
+            # check if we made a change in our position
+            if trade > 0:
+                # we just entered a new long position - keep track of delta
+                buy_price = cur_price
+            elif trade < 0:
+                # we have exited our position - our delta from here is 0
+                delta = 0
+
+            cost_of_trade = trades[idx] * cur_price
             current_capital -= cost_of_trade + self.commission * np.abs(cost_of_trade)
             capital[idx]= current_capital
 
