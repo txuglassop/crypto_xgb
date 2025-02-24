@@ -8,6 +8,8 @@ All features from this module are imported, and more can be added
 import numpy as np
 import pandas as pd
 
+from utility_functions import add_dow_dummy
+
 from feature_engineering import *
 
 
@@ -91,7 +93,8 @@ def add_features(df: pd.DataFrame, session):
     add_sma_feature(df, 'volume', window=24)
 
     add_dow(df)
-    df = pd.get_dummies(df, columns=['day_of_week'], prefix='dow', drop_first=True)
+    add_dow_dummy(df)
+    #df = pd.get_dummies(df, columns=['day_of_week'], prefix='dow', drop_first=True)
 
     cols = [
         'open', 'high', 'low', 'close', 'volume', 'return', 'log_return', 'jump_neutral', 'jump_up',

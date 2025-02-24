@@ -101,3 +101,11 @@ def get_monthly_returns(timestamp: pd.Series, equity: pd.Series) -> list:
     returns.append(equity[len(equity)-1] / start - 1)
 
     return returns
+
+def add_dow_dummy(df):
+    all_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+    for day in all_days[1:]:  # make monday the reference category
+        df[f'dow_{day}'] = [1 if d == day else 0 for d in df['day_of_week']]
+
+    del df['day_of_week']
