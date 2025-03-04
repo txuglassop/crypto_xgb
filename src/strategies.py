@@ -48,6 +48,19 @@ def stop_loss_3_class(next_prediction: int, price: float, current_pos: float, cu
         return current_capital // price
     else:
         return 0
+    
+def take_profit_3_class(next_prediction: int, price: float, current_pos: float, current_capital: float, delta: float) -> int:
+    """
+    if delta has crossed over our take profit, sell, same with stop loss
+    """
+    take_profit = 0.04
+    stop_loss = -0.08
+    if next_prediction == 0 or delta < stop_loss or delta > take_profit:
+        return -current_pos
+    elif next_prediction == 2:
+        return current_capital // price
+    else:
+        return 0
 
 def short_3_class(next_prediction: int, price: float, current_pos: float, current_capital: float, delta: float) -> int:
     """
