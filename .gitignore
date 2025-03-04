@@ -1,8 +1,9 @@
 **/__pycache__/
 
 input/*
-!BTCUSDT_1h_2020_2024_final.csv
-!ETHUSDT_1h_2020_2024_join_final.csv
+!BTCUSDT_1h_2020.csv
+!BTCUSDT_30m_2020.csv
+!ETHUSDT_1h_2020.csv
 
 notebooks/*
 !notebooks/wf.ipynb
