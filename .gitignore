@@ -13,7 +13,9 @@ env/*
 
 backtests/*
 
+
 models/
+!models/.gitkeep
 
 #!backtests/
 
