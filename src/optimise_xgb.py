@@ -33,7 +33,7 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
         params['colsample_bytree'] = trial.suggest_uniform('colsample_bytree', 0, 1)
 
     if group == '3':
-        params['num_boost_round'] = trial.suggest_int('num_boost_round', 100, 400)
+        params['num_boost_round'] = trial.suggest_int('num_boost_round', 100, 600)
         params['learning_rate'] = trial.suggest_uniform('learning_rate', 0.005, 0.1)
 
     if group == '4':
@@ -63,7 +63,7 @@ def _execute_optimisation(X_train, y_train, num_classes, study_name, group, scor
     study = create_study(
         direction=direction,
         study_name=study_name,
-        storage=f'sqlite:///optuna_{data}.db',
+        storage=f'sqlite:///db/optuna_{data}.db',
         load_if_exists=True,
         pruner=pruner,
         sampler=sampler

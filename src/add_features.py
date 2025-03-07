@@ -479,11 +479,6 @@ def add_features_exp(df: pd.DataFrame, session):
     add_dow(df)
     add_dow_dummy(df)
 
-    drop = [
-        'open', 'high', 'low', 'close', 'volume', 'base_asset_volume', 'no_trades', 'taker_buy_vol', 'taker_buy_base_asset_vol', 'avg_price'
-    ]
-    df.drop(drop, inplace=True, axis=1)
-
     # cols to lag
     cols = [
         'return', 'log_return', 'jump_neutral', 'jump_up', 'return_log_return'

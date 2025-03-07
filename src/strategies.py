@@ -53,7 +53,7 @@ def take_profit_3_class(next_prediction: int, price: float, current_pos: float, 
     """
     if delta has crossed over our take profit, sell, same with stop loss
     """
-    take_profit = 0.04
+    take_profit = 0.11
     stop_loss = -0.08
     if next_prediction == 0 or delta < stop_loss or delta > take_profit:
         return -current_pos
