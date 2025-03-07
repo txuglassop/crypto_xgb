@@ -117,6 +117,11 @@ def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_clas
     final_params['objective'] = 'multi:softprob'
     final_params['num_class'] = num_classes
 
+    # use gpu
+    final_params['tree_method'] = 'hist'
+    final_params['device'] = 'cuda'
+
+
     for g in ['1', '2', '3', '4']:
         print(f'====== Optimising Group {g} ======')
         update_params = _execute_optimisation(

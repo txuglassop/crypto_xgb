@@ -13,6 +13,8 @@ env/*
 
 backtests/*
 
+models/
+
 #!backtests/
 
 .vscode/
