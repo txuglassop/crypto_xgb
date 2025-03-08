@@ -53,7 +53,7 @@ def _objective(trial, X, y, num_classes, group, score, params=dict()):
     
     return cv_scores['test-' + score.__name__ + '-mean'].values[-1]
 
-def _execute_optimisation(X_train, y_train, num_classes, study_name, group, score, trials, data:str, params=dict(), direction='maximize',):
+def _execute_optimisation(X_train, y_train, num_classes, study_name, group, score, trials, db_url:str, params=dict(), direction='maximize', n_jobs=1):
     ## use pruner to skip trials that aren't doing so well
     pruner = MedianPruner(n_warmup_steps=20)
 
@@ -63,7 +63,7 @@ def _execute_optimisation(X_train, y_train, num_classes, study_name, group, scor
     study = create_study(
         direction=direction,
         study_name=study_name,
-        storage=f'sqlite:///db/optuna_{data}.db',
+        storage=f'sqlite:///{db_url}',
         load_if_exists=True,
         pruner=pruner,
         sampler=sampler
@@ -72,7 +72,7 @@ def _execute_optimisation(X_train, y_train, num_classes, study_name, group, scor
     study.optimize(
         lambda trial: _objective(trial, X_train, y_train, num_classes, group, score, params),
         n_trials=trials,
-        n_jobs=N_JOBS
+        n_jobs=n_jobs
     )
 
     print('STUDY NAME: ', study_name)
@@ -91,7 +91,7 @@ def _execute_optimisation(X_train, y_train, num_classes, study_name, group, scor
 
     return updated_params
 
-def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_classes: int, eval_metric: callable, data: str, trials=9) -> dict:
+def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_classes: int, eval_metric: callable, db_url: str, n_jobs=1, trials=9) -> dict:
     """
     Execute stepwise optimisation to find optimal CV parameters for XGBoost given the train set. 
 
@@ -125,7 +125,7 @@ def stepwise_optimisation(X_train: pd.DataFrame, y_train: pd.DataFrame, num_clas
     for g in ['1', '2', '3', '4']:
         print(f'====== Optimising Group {g} ======')
         update_params = _execute_optimisation(
-            X_train, y_train, num_classes, 'xgboost', g, eval_metric, trials, data, params=final_params, direction='maximize',
+            X_train, y_train, num_classes, 'xgboost', g, eval_metric, trials, db_url, params=final_params, direction='maximize', n_jobs=n_jobs
         )
         final_params.update(update_params)
         print(f'Params after updating group {g}: ', final_params)
