@@ -12,6 +12,7 @@ notebooks/*
 env/*
 
 backtests/*
+!backtests/ETHUSDT_1h_08-03-25_21:12:06
 
 
 models/

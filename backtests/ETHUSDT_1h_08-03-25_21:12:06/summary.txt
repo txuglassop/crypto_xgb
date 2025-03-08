@@ -1,0 +1,152 @@
+
+================== Session Info ==================
+
+Data:                           ETHUSDT_1h_2020.csv
+Num Classes:                    3
+Lag Factor:                     5
+Test Size:                      0.2
+
+Up Margin:                      0.0068
+Down Margin:                    0.0038
+
+
+-------------------- Features --------------------
+
+open, high, low, close, volume, base_asset_volume,
+no_trades, taker_buy_vol,
+taker_buy_base_asset_vol, return, log_return,
+jump_neutral, jump_up, atr_3, atr_5, atr_8,
+atr_10, atr_12, atr_15, atr_20, atr_25, atr_30,
+atr_35, atr_40, atr_5_3, atr_8_3, atr_10_3,
+atr_12_3, atr_15_3, atr_20_3, atr_25_3, atr_30_3,
+atr_8_5, atr_10_5, atr_12_5, atr_15_5, atr_20_5,
+atr_25_5, atr_30_5, atr_10_8, atr_12_8, atr_15_8,
+atr_20_8, atr_25_8, atr_30_8, avg_price, ema_25,
+sma_25, vidya_25, price_sma_3, price_sma_5,
+price_sma_8, price_sma_10, price_sma_12,
+price_sma_15, price_sma_17, price_sma_20,
+price_sma_30, price_vidya_3, price_vidya_5,
+price_vidya_8, price_vidya_10, price_vidya_12,
+price_vidya_15, price_vidya_17, price_vidya_20,
+price_vidya_30, ema_5_3, ema_8_3, ema_10_3,
+ema_12_3, ema_15_3, ema_20_3, ema_25_3, ema_30_3,
+ema_8_5, ema_10_5, ema_12_5, ema_15_5, ema_20_5,
+ema_25_5, ema_30_5, ema_10_8, ema_12_8, ema_15_8,
+ema_20_8, ema_25_8, ema_30_8, sma_5_3, sma_8_3,
+sma_10_3, sma_12_3, sma_15_3, sma_20_3, sma_25_3,
+sma_30_3, sma_8_5, sma_10_5, sma_12_5, sma_15_5,
+sma_20_5, sma_25_5, sma_30_5, sma_10_8, sma_12_8,
+sma_15_8, sma_20_8, sma_25_8, sma_30_8, vidya_5_3,
+vidya_8_3, vidya_10_3, vidya_12_3, vidya_15_3,
+vidya_20_3, vidya_25_3, vidya_30_3, vidya_8_5,
+vidya_10_5, vidya_12_5, vidya_15_5, vidya_20_5,
+vidya_25_5, vidya_30_5, vidya_10_8, vidya_12_8,
+vidya_15_8, vidya_20_8, vidya_25_8, vidya_30_8,
+ema_sma_3, ema_sma_5, ema_sma_8, ema_sma_10,
+ema_sma_12, ema_sma_15, ema_sma_17, ema_sma_20,
+ema_sma_30, ema_vidya_3, ema_vidya_5, ema_vidya_8,
+ema_vidya_10, ema_vidya_12, ema_vidya_15,
+ema_vidya_17, ema_vidya_20, ema_vidya_30,
+sma_vidya_3, sma_vidya_5, sma_vidya_8,
+sma_vidya_10, sma_vidya_12, sma_vidya_15,
+sma_vidya_17, sma_vidya_20, sma_vidya_30, cmo_3,
+cmo_5, cmo_8, cmo_10, cmo_12, cmo_15, cmo_17,
+cmo_20, cmo_25, cmo_30, cmf_3, cmf_5, cmf_8,
+cmf_10, cmf_12, cmf_15, cmf_17, cmf_20, cmf_25,
+cmf_30, cmo_5_3, cmo_8_3, cmo_10_3, cmo_12_3,
+cmo_15_3, cmo_20_3, cmo_25_3, cmo_30_3, cmo_8_5,
+cmo_10_5, cmo_12_5, cmo_15_5, cmo_20_5, cmo_25_5,
+cmo_30_5, cmo_10_8, cmo_12_8, cmo_15_8, cmo_20_8,
+cmo_25_8, cmo_30_8, cmf_5_3, cmf_8_3, cmf_10_3,
+cmf_12_3, cmf_15_3, cmf_20_3, cmf_25_3, cmf_30_3,
+cmf_8_5, cmf_10_5, cmf_12_5, cmf_15_5, cmf_20_5,
+cmf_25_5, cmf_30_5, cmf_10_8, cmf_12_8, cmf_15_8,
+cmf_20_8, cmf_25_8, cmf_30_8, prop_taker,
+avg_transaction, sma_volume_25, sma_volume_5_3,
+sma_volume_8_3, sma_volume_10_3, sma_volume_12_3,
+sma_volume_15_3, sma_volume_20_3, sma_volume_25_3,
+sma_volume_30_3, sma_volume_8_5, sma_volume_10_5,
+sma_volume_12_5, sma_volume_15_5, sma_volume_20_5,
+sma_volume_25_5, sma_volume_30_5, sma_volume_10_8,
+sma_volume_12_8, sma_volume_15_8, sma_volume_20_8,
+sma_volume_25_8, sma_volume_30_8, vwap,
+vwap_price, return_log_return,
+return_over_log_return, high_low, high_over_low,
+dow_Tuesday, dow_Wednesday, dow_Thursday,
+dow_Friday, dow_Saturday, dow_Sunday, return_1,
+log_return_1, jump_neutral_1, jump_up_1,
+return_log_return_1, return_2, log_return_2,
+jump_neutral_2, jump_up_2, return_log_return_2,
+return_3, log_return_3, jump_neutral_3, jump_up_3,
+return_log_return_3, return_4, log_return_4,
+jump_neutral_4, jump_up_4, return_log_return_4,
+return_5, log_return_5, jump_neutral_5, jump_up_5,
+return_log_return_5
+
+------------------- Parameters -------------------
+
+num_boost_round : 314
+learning_rate : 0.043297679880776076
+objective : multi:softprob
+num_class : 3
+tree_method : hist
+device : cuda
+max_depth : 20
+min_child_weight : 30.100227787437074
+subsample : 0.8023161286231686
+colsample_bytree : 0.8998189079131126
+gamma : 2.5141433319097106
+
+
+================ Backtest  Metrics ================
+
+---------------- Test  Information ----------------
+
+Start:                          2024-02-15 15:00:00
+End:                            2025-02-25 09:00:00
+Duration:                       375 days, 18 hours, 0 mins, 0 seconds
+
+---------------- Strategy Metrics -----------------
+
+Strategy:                       take_profit_3_class
+
+Exposure:                       0.29770484532653285
+Initial Equity:                 500000.00 
+Equity High:                    893112.59 
+Equity Low:                     487152.41 
+Final Equity:                   709249.20 
+
+Return (ann.) [%]:              37.46     
+Buy & Hold Return (ann.) [%]:   -10.19    
+Volatility (ann.) [%]:          32.28     
+Sharpe Ratio (R=4.00%): 1.04      
+
+----------------- Trade  Metrics ------------------
+
+Num. Trades:                    88        
+Win Rate [%]:                   76.89     
+Avg. Trade [%]:                 2.24      
+Avg. Trade Duration:            30.139722094036816 hours
+
+Best Trade [%]:                 19.69     
+Avg. Winning Trade [%]:         3.92      
+
+Worst Trade [%]:                -14.30    
+Avg. Losing Trade [%]:          -3.37     
+
+-------------- Classification Report --------------
+              precision    recall  f1-score   support
+
+           0       0.48      0.10      0.17      1461
+           1       0.79      0.97      0.87      6935
+           2       0.48      0.11      0.18       623
+
+    accuracy                           0.77      9019
+   macro avg       0.58      0.40      0.41      9019
+weighted avg       0.72      0.77      0.71      9019
+
+
+---------------- Confusion Matrix ----------------
+[[ 149 1288   24]
+ [ 136 6747   52]
+ [  27  526   70]]
