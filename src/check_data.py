@@ -17,7 +17,7 @@ def check_data(df: pd.DataFrame):
     print(f'\n>>> Running data check <<<')
 
     l = df['timestamp']
-    if all(l[i] <= l[i+1] for i in range(len(l) - 1)):
+    if all(l.iloc[i] <= l.iloc[i+1] for i in range(len(l) - 1)):
         print('Data is sorted\n')
     else:
         print('Data is NOT sorted - please check timestamp feature')
@@ -46,4 +46,5 @@ def check_data(df: pd.DataFrame):
 
 if __name__ == '__main__':
     path = sys.argv[1]
-    check_data(path)
+    df = pd.read_csv(path)
+    check_data(df)

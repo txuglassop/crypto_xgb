@@ -41,6 +41,11 @@ def get_data(symbol, interval, year, month, day):
     df = df.iloc[:-1]
     check_data(df)
 
+    return df
+
+def get_and_write_data(symbol, interval, year, month, day):
+    df = get_data(symbol, interval, year, month, day)
+
     name = symbol + '_' + interval + '_' + str(year)
     if month != 1:
         name = name + '_' + str(month)
@@ -56,5 +61,5 @@ if __name__ == '__main__':
     month = int(sys.argv[4]) 
     day = int(sys.argv[5])
 
-    get_data(symbol, interval, year, month, day)
+    get_and_write_data(symbol, interval, year, month, day)
 
