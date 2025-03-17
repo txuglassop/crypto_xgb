@@ -2,7 +2,7 @@
 
 *A workflow to develop, train and backtests XGBoost models to predict jumps in crypto prices! Supports custom feature engineering, evaluation metrics, trading strategies, and more!*
 
-> [!INFO]
+> [!NOTE]
 > Check out `notebooks/wf.ipynb` for a demonstration!
 
 **CryptoXGB is not intended to be used for financial decision making.**
