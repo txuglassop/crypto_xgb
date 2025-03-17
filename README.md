@@ -2,8 +2,8 @@
 
 *A workflow to develop, train and backtests XGBoost models to predict jumps in crypto prices! Supports custom feature engineering, evaluation metrics, trading strategies, and more!*
 
->[!info]
->Check out `notebooks/wf.ipynb` for a demonstration!
+> [!INFO]
+> Check out `notebooks/wf.ipynb` for a demonstration!
 
 **CryptoXGB is not intended to be used for financial decision making.**
 
@@ -34,6 +34,18 @@ CryptoXGB uses stepwise optimisation with the `Optuna` library for hyperparamete
 
 To achieve good results, a lot of computation is required, so cloud computing is not a bad idea. `colab.py` is an alternative to `wf.ipynb` that has some Google Colab features ready to go, as well as GPU acceleration to speed up this process.
 
+You can also specify a custom evaluation metric as the objective function for XGBoost's training algorithm. See `eval_metrics.py` for more.
+
+Then, to initiate the optimisation, run
+```python
+from optimise_xgb import stepwise_optimisation
+from eval_metrics import <metric>
+
+db_url = f'db/<name_of_sqlite_db>'
+
+params = stepwise_optimisation(X_train, y_train, num_classes, eval_metric, db_url, n_jobs=1, trials=500)
+```
+
 
 ## Backtesting
 
@@ -41,6 +53,8 @@ Before we backtest our model, you can make your custom trading strategy in `stra
 
 To run a backtest, create an instance of the `Backtest` class from `backtest.py` and initialise training and test sets as well as the corresponding timestamps. For example,
 ```python
+from backtest import backtest
+
 backtest = Backtest(
     model_trainer, X_train, y_train, X_test, y_test, train_timestamp, test_timestamp, num_classes,
     starting_capital=500_000, commission=0.0002
@@ -55,6 +69,8 @@ bt_results = backtest.run_backtest(strategy, retrain=True, train_frequency=24*7,
 
 You can then analyse the backtest by plotting it or printing some common metrics using the functions from `backtests_metrics.py`,
 ```python
+from backtest_metrics import plot_backtest, print_backtest_metrics
+
 plot_backtest(bt_results)
 
 print_backtest_metrics(bt_results)
