@@ -9,7 +9,7 @@
 
 ## Getting started
 
-Fork this repo, then run
+Clone this repo, then run
 ```sh
 pip install -r requirements.txt
 ```
